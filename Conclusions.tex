@@ -1,0 +1,94 @@
+% star NOT needed to make sure that the 'Conclusions' are  included in chapter numbering
+\chapter{Conclusions}
+%
+Coarse-graining collectively denotes a variety of methods that are used to build eective
+surrogate models of a given physical system; for example, classical thermodynamics is a
+surrogate model of classical dynamics of many-particle systems, which can be obtained by
+resorting to statistical mechanics.
+Many systems display complex hierarchy of aggregation levels and, at a larger scale,
+the truly physically meaningful observables are those quantities that faithfully characterize
+the collective properties. In principle, the nature laws at high resolution could be scaled
+up and would still describe the physics at a lower resolution; however, as the number of
+degrees of freedom increases exponentially, the “big picture” properties are washed out by
+an overwhelming and highly dimensional description. For instance, recording the position
+and velocity of each ideal gas pld be the most detailed
+description we could ever have, but just looking at such a dataset as is, would not tell us
+anything about the gas temperature and pressure.
+This suggests that the level of detail of a physical model needs to be modulated according
+to the resolution at which the system is investigated: in particular, the high resolution
+degrees of freedom should be decimated and replaced by a (smaller) number of eective
+new ones and a set of interactions, and coarse-graining methods investigate how that can
+be accomplished in practice.
+In this Dissertation we discussed a number of topics associated with formulating a coarsegrained
+model of an all-atom representation, by adopting a bottom-up approach. Extensive
+all-atom equilibrium simulation data are available nowadays, and already encode the low
+resolution description, e.g. slow timescale dynamics, perturbed by the high resolution de
+tails, e.g. the (ultra) fast vibrations of the individual atoms. It is then quite natural to
+adopt a data-driven stance, and use physics-based machine-learning techniques to extract
+the essential information while filtering out the fast motions.
+We first discussed how the essential information in the biomolecular context is fully
+captured by the dominant eigenvectors and eigenvalues of the generator underlying the
+dynamics. Then, an optimized technique named Variationally Optimized Diusion Maps
+was introduced (Ch. 3) as a self-consistent unitary analysis framework to estimate eigenvectors
+and eigenvalues from an all-atom simulation. The method was applied to a simple
+protein, performs better than other popular approaches, and is recommended as a rigorous
+validation technique for comparing dierent calculation setups and parameter choices.
+From a strictly algorithmic point of view, the method we propose requires the computation
+and storage of large (sparse) correlation matrices, which is greatly time-consuming
+and memory expensive. A compressed sensing method named oASIS was discussed (Ch. 4)
+which allows to efficiently reconstruct the full matrices by using just a small subset of their
+entries.
+Ch. 5 discusses how the collective coordinate formulation can be adapted to identifying
+a set of coarse-grained degrees of freedom. The Structure and State Space Decomposition
+method extracts dynamically coherent groups of atom by post-processing an allatom
+simulation, and those sets are good candidates for coarse-grained “beads”. Applying
+the method to two proteins revealed the intriguing possibility that a kinetically consistent
+coarse-graining description may require a dierent level of resolution according to the region
+of the configuration space being visited: indeed, the beads are shown to merge together
+dierently in dierent metastable states.
+A set of coarse-grained degrees of freedom needs to be accompanied by their eective
+equations of motions. It is discussed in Ch. 6 and 7 how two complementary strategies
+(Sparse Learning of Stochastic Dynamics and Spectral Coarse-Graining) are successfully
+applied to toy-models to agnostically recover appropriate equations of motion. Both strate
+
+
+gies start out by choosing a parametric Ansatz for the terms in a diusive equation, and
+then a fitting problem on the data is formulated: the solution to the problem is the optimal
+dynamical model which best interpolates the data.
+The novel approaches discussed in this Dissertation all contribute to shed light onto a
+more rigorous and parameter-free coarse-graining stance. This is a substantial step into the
+right direction, but there are still a number of crucial issues that require more attention.
+First of all, all methods require an extensive all-atom equilibrium trajectory as an input,
+which might be challenging for large scale systems. In order to mitigate its impact,
+we have been actively working on implementing transferability of the models, especially
+as far as identifying coarse-grained degrees of freedom is concerned. Transferability is the
+quintessential coarse-graining issue, which would ensure protocol systematicity and reproducibility
+across dierent systems. In order to target that, the Structure and State Space
+Decomposition is being run on a vast pool of dierent proteins, and the dierent decompositions
+of the primary sequence are compared in order to identify common decomposition
+patterns, (e.g., Which atomic species stay together? Do the backbone and side chains move
+coherently?) The hope is to generate a comprehensive database with a set of recipes for
+lumping together atoms into eective beads across dierent systems.
+Second, even if the decomposition were reproducible, it is not clear yet which coordinates
+shall be used to describe the eective beads. This is a crucial point, since this choice will
+aect the functional form of the eective equations of motion. A viable strategy is to model
+each bead as an ellipsoid and use the coordinates of its center of gravity as eective ones.
+Current explorations are broadly investigating dierent aspects associated with this issue.
+Third, there is no guarantee that the coarse-grained equations of motions will have a
+closed form. So far, in our examples, choices were made which ensured that the resulted
+
+
+
+
+that cannot be written out in a closed form (Mori-Zwanzig formalism). The most general
+result available is that the projected dynamics in the space of the dominant eigenvectors
+would still be a Markovian (non-homogeneous) diusion process: however, working in such a
+reduced configurational space would compromise the physical interpretability of the model;
+we do know that the eigenvectors do not have a structural interpretation. Implementing
+dierent levels of approximation into the Mori-Zwanzig projection formalism, and compare
+the resulting dynamical models is a type of research that will need to be addressed, in order
+to broaden the number of dynamical models whose parameters can be learned.
+All in all, the work detailed in this Dissertation is a considerable leap forward in the
+interdisciplinary field of data-driven molecular coarse-graining, and presents a unitary vision
+of how configurational and structural coarse-graining scan be tackled simultaneously. This is
+not of course the end of the story, and represents a new starting point for more investigations.

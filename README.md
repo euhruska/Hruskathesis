@@ -1,0 +1,3 @@
+# run commands 
+```
+./compile.sh

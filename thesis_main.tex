@@ -1,0 +1,114 @@
+\documentclass[12pt]{ruthesis} 
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphics}
+\usepackage{epsfig,epsf,rotating}
+\usepackage{subcaption}
+%\usepackage{pictex}
+\usepackage{epsf}
+\usepackage{cite}
+\usepackage{color}
+\usepackage{theorem}
+\newtheorem{proposition}{Proposition}
+
+\theoremheaderfont{\itshape} {\theoremstyle{break}
+\newtheorem{Fact}{Fact}[chapter]} \theoremstyle{break}
+\newtheorem{Lem}{Lemma}[chapter] \theoremstyle{break}
+\newtheorem{Thm}{Theorem}[chapter] {\theoremstyle{plain}
+  \theorembodyfont{\rmfamily}  \newtheorem{Prf}{Proof}[chapter]}
+{\theoremstyle{plain}
+  \theorembodyfont{\rmfamily}  \newtheorem{Def}{Definition}[chapter]}
+
+\newcommand\GRE[1]{\textcolor{green}{\textbf{#1}}}
+\newcommand\RED[1]{\textcolor{red}{\textbf{#1}}}
+
+\title{Adaptive sampling of Conformational Dynamics}
+\ctitle{Adaptive sampling of Conformational Dynamics}
+\author{Eugen Hruška}
+%\department{Electrical and Computer Engineering}
+\school{Rice University}
+\degree{Doctor of Philosophy}
+
+\committee {
+        Cecilia Clementi, Thesis Director\\
+Professor of Chemistry and Chemical \&
+Biomolecular Engineering\and
+Jose Onuchic, Chair \\
+        Harry C. and Olga K. Wiess Chair of
+Physics, Professor of Chemistry and
+BioSciences \and
+        Jason Hafner \\
+        Professor of Physics \& Astronomy and
+Chemistry \and
+        Matteo Pasquali\\
+        A. J. Hartsook Professor of Chemical and
+Biomolecular Engineering, Chemistry,
+Material Science and NanoEngineering 
+}
+
+\address{Houston, Texas}
+\donemonth{April} \doneyear{2020} \makeindex
+\begin{document}
+
+  \begin{frontmatter}
+   \pagenumbering{roman}
+   %\makecover
+   \maketitle
+   \include{abstract}
+   %\include{ded}
+   \include{acknowledge}
+   %\include{ack}
+   \tableofcontents
+   \listoffigures
+   \listoftables
+%   \include{ded}
+  \end{frontmatter}
+\pagenumbering{arabic}
+
+\linespacing{1.7}
+
+%\include{chapter1}
+
+%\include{Introduction}
+%\shipout\null
+
+%1 -motivation, intro
+
+% 2 - diffusion map - for dmdm for extasy 1
+
+% 3 - theory - apper
+
+% 4 software paper extasy1, paper extasy 2 part
+
+% 5 applicatoon extasy paper2
+
+% Conclusion
+
+\include{Chapter1}    
+%\shipout\null
+\include{Chapter2}    
+%\shipout\null
+\include{Chapter3}    
+%\shipout\null
+\include{Chapter4}    
+%\shipout\null
+\include{Chapter5}    
+%\shipout\null
+%\include{Chapter6}    
+%\shipout\null
+\include{Conclusions}   
+
+\appendix
+
+%\include{append-a}
+%\appendix
+%\addcontentsline{toc} {chapter}{\numberline {}Appendix}
+%\include{append-a}
+%\include{append-b}
+\addcontentsline{toc} {chapter}{\numberline {}Bibliography}{}
+%\include{PhD_bib}
+
+\bibliographystyle{naturemag}
+\bibliography{thesis_main}
+\end{document}
