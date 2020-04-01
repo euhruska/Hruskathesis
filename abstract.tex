@@ -1,50 +1,22 @@
 \thispagestyle{empty}
 \begin{abstract}
 
-\emph{Coarse-graining} \RED{2 pagesis an ubiquitous concept in the sciences, and
-denotes a variety of diverse methods to consistently formulate a low
-resolution model of a physical system. If detailed data from a higher-resolution
-model is available, a popular \emph{bottom-up} approach consists in
-\textit{renormalizing} that information into a surrogate model, by properly
-filtering out \emph{non-essential} details, while preserving what
-is considered\emph{ essential}. }
+The challenge of predicting the conformation dynamics of biomolecules is at the core of our limited ability to understand many biophysical processes. This includes many questions around the causes of many diseases and biophysics theory. \emph{Adaptive sampling} is an approach to increase our ability to predict conformational dynamics. 
 
-For biological molecules, a coarse-grained model requires groups
-of atoms to be replaced by effective degrees of freedom and their
-new interactions to be specified. In addition, the long timescale
-features of the original dynamics shall be preserved, since they correlate
-with physico-chemically relevant conformational rearrangements, such
-as (mis)folding. It can be shown that such features are completely
-encoded in the first few eigenvalues and eigenvectors of the operator
-implementing the dynamics. Thus, it all amounts to being able to
-approximate such quantities from the high resolution data
-and then ensure that the coarse-graining procedure does not perturb
-them. 
+The challenge of effectively sampling the conformation dynamics of biomolecules is one example of a more general problem.  In terms of physics, the general problem is the accurate sampling of time-dynamics of high-dimensional stochastic systems. The high-dimensionality presents here several challenges. The high-dimensionality with a complex energy landscape prevents any simple solutions. Additionally the. 
+dimensional curse. 
 
-In this Dissertation, different data-driven techniques addressing various
-aspects of molecular coarse-graining will be presented.
+In the past many approaches to unravel this challenge have in the past achieved significant improvements. In the case of proteins, the timescales where we are able to predict the conformational dynamics increased by many orders of magnitudes to the millisecond scale. This illustrated the magnitude of the challenge since the current state-of-art can only small proteins and for most, larger biomolecules we are not able to predict the accurate behavior. This is not only caused by the several magnitude longer timescales but also order of magnitude larger sizes of the biomolecules.  
 
-First, the problem of distilling a set of physically meaningful collective descriptors from high-resolution data is discussed. 
-In particular, a novel strategy (\textit{Variationally optimized Diffusion Maps}) combining existing algorithms to accomplish that is presented, both as validation strategy against different choices of the model parameters, and as an optimized algorithm. Such an approach often requires the computation and storage of large correlation matrices, so a compressed sensing procedure (\textit{oASIS}) is discussed, which allows to fully reconstruct sparse matrices using only a subset of their entries.
+Considering the broad scope of the general challenge for high-dimensional stochastic system this Dissertation will focus on only improving the prediction of conformational dynamics of proteins. This restriction doesn't limit the applicability of the methods investigated to other high-dimensional stochastic systems.
 
-Second, the \textit{Structure and State Space Decomposition} ($S^{3}D$) protocol will be discussed, which maps a molecular
-primary sequence onto a set of disjoint dynamically coherent domains.
-Such units are compelling candidates for effective coarse-grained
-degrees of freedom and provide a novel interpretation of the conformational
-rearragements the molecule undergoes in terms of splitting and merging
-of those units. In particular, results seem to indicate that different
-model resolutions may be appropriate for different regions of the
-conformational space. 
+First the prediction of the effectivity of different adaptive sampling strategies will be discussed. Due to significant stochasticity and protein-to-protein variation the choice of adaptive sampling strategy is not obvious. The performance for different goals varies as well. 
 
-Next, the \textit{Stepwise Sparse Regressor} and \textit{Spectral Coarse-Graining} will be introduced that
-allow to infer the constitutive \textit{renormalized} interactions which
-regulate the effective diffusive dynamics of the coarser variables. Both approaches rely on constructing a data-based loss function and optimize its parameters. Preliminary
-results on toy-models indicate that both methods consistently capture the long
-timescale features expressed by the input data. 
+Second, to deepen our theoretical undertanding adaptive sampling strategies, a upper limit for the performance of any adaptive sampling strategy is developed. This theoretical upper limit allows us to g In particular 
 
-Finally, future developments
-and ideas on how to extend the approaches to real molecular systems will be also addressed.
+Third, adaptive sampling is heavily dependent on software due to the thousands or millions individual steps necessary to be performed, all in an effecient fashion of a High-Performance Computer (HPC). Here we show the development of the software package \emph{ExTASY}. This framework allows to execute all the necessary steps for adaptive sampling while reducing the work-load. The innovations with ExTASY are both the high-scalability and the modularity which allow for an easy change of the adaptive sampling strategies and maintanance. 
 
+Future developments to extend the investigated approaches to longer timescales will be addressed.
 
 \end{abstract}
 
