@@ -11,7 +11,19 @@
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{theorem}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{float}
 \usepackage{listings}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{textalpha}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{afterpage}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+\DeclareUnicodeCharacter{0301}{ }
 \newtheorem{proposition}{Proposition}
 
 \theoremheaderfont{\itshape} {\theoremstyle{break}
@@ -32,7 +44,7 @@
     \draw  (micrograph.north west)  node[anchor=north west,yshift=-#4, xshift=#5,black]{\textbf{\large{#3}}}; %I draw the image label
   \end{tikzpicture}
 }
-\usepackage{listings}
+
 
 
 \definecolor{background}{rgb}{0.94,0.95,0.96}
@@ -97,8 +109,9 @@ Material Science and NanoEngineering
    \pagenumbering{roman}
    %\makecover
    \maketitle
-   \include{abstract}
+   
    %\include{ded}
+   \include{abstract}
    \include{acknowledge}
    %\include{ack}
    \tableofcontents

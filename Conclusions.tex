@@ -1,13 +1,13 @@
-
+\afterpage{\null\newpage}
 \chapter{Conclusions}
-
+\label{ch:conclude}
 \emph{Adaptive sampling} increases our ability to predict conformational dynamics of high-dimensional stochastic systems or the general problem of high-dimensional stochastic systems. 
 In theory adaptive sampling can increase sampling efficiency of a energy landscape by reducing the "redundant" samples. In practive the choice which sampling is "redundant" is a non-trivial and crucial step to increase the sampling efficiency of the sampling. This choice which of the sampling is "redundant" depends on the goal of the sampling and only approximations are currently possible. This reduces the effectivity of adaptive sampling to the theoretical maximum. 
 In chapter \label{ch:chapter3} this theoretical maximal efficiency of adaptive sampling is derived, first time develop by the author. It is shown that this maximum efficiency depends on the goal of the sampling, wether a maximal exploration is desired or a fast folding is desired. This maximum efficiency also depends on the protein and generally increases with the complexity and size of the protein. Adaptive sampling is more efficient in a complex transition region compare to a flat transitionregion. By extrapolating we can estimate that adaptive sampling can reach a speed up of at least 10-100 for larger proteins. By comparing the theoretical maximal efficiency we can show that additional improvements in adaptive sampling strategies are possible.
 
 In Chapter \label{ch:chapter32} we could show that different adaptive sampling strategies are superior for different goals. The \emph{cmicro} strategy is better for exploration and the \emph{cmacro} startegy is better for crossing transition barriers such as folding. This is true across different protein, but the speed up achievable with adaptive sampling depends on the complexity of the proteins. Proteins with more complex timescales are expected to have a higher speed up with adaptive sampling compared to plain molecular dynamics. The stochasticity of molecular dynamics and sampling causes the time to solution to fluctuate significant, sometimes in order of 50\%. This means a single or few folding events, commonly caused by limited computational resources, has limited statistical significance when comparing adaptive sampling with plain molecular dynamics.
 
-The improvements of the software package \emph{ExTASY} shown in chapter \label{ch:chapter4} allow anyone to more eficiently to deploy adaptive sampling to sample any proteins. This packag ensures state-of-the-art scalability on High-Prormance Computers and the modularity ensures the maintainalibity and user-friendly extensibility.
+The improvements of the software package \emph{ExTASY} shown in chapter \label{ch:chapter4} allow anyone to more eficiently to deploy adaptive sampling to sample any proteins. This packag ensures state-of-the-art scalability on High-Performance Computers and the modularity ensures the maintainalibity and user-friendly extensibility.
 
 The application of \emph{ExTASY} in Chapter \label{ch:chapter5} shows that adaptive sampling reaches the promised speed ups for proteins up to size of 72 residues. For these proteins not only the folded state is recovered, but also conformational dynamics. Extending to larger proteins is only limited by computational resourced.
 

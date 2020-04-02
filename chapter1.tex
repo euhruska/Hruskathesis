@@ -1,16 +1,50 @@
-\chapter{Motivation and Preface}
-\label{ch:Intro}
-\RED{start challenge}
-\GRE{This thesis is about solving the challenge of accurately determining the confomational dynamics of high-dimensional stochastic systems. This challenge of high-dimensional stochastic dynamics   
-adaptive sampling of conformational dynamics, a method to efficiently obtain relevant information about the stationary and kinetic behavior of high-dimensional stochastic dynamics. This methods is especially usefull in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge which limits our understanding of the behavior of many systems. This includes the majority of biological processes. }
-behavior represents are common high-dimensional problem. all examples on proteins. But the adaptive sampling methods can be applied for any high-dimensional stochastic dynamics with the corresponding transition barriers.
-Ever increasing demand for high data rate wireless transmissions with high spectral efficiency leads to utilization of communication systems with multiple transmit and receive antennas. Excellent quality of service represented with near-channel capacity error-rate performance can be achieved with iterative receiver structure composed of inner soft detection and outer soft-input soft-output decoding. Emerging wireless standards such as:~Wireless Local Area Network (W-LAN), Worldwide Interoperability for Microwave Access (WiMAX), $3^{rd}$ Generation Partnership Project Long Term Evolution (3GPP-LTE), etc are being constantly revised to provide higher data rates and better error-rate performance. Iterative receivers based on inner soft detection and outer decoding are promising solutions.
+\chapter{Motivation and Approach}
 
-In this thesis, we propose to address issues of designing efficient physical layer receiver structure targeting its use in emerging wireless systems, including both downlink and uplink scenarios. It is our goal to develop performance-efficient wireless receiver with implementable hardware cost while achieving data throughputs in the order of hundreds MBits/sec. 
+\section{Adaptive sampling: Motivation}
+Physical systems come in many forms and shapes and 
 
+Intrinsic hierachical organisation
+
+Molecular dynamics (MD) simulations have become indispensable for gaining
+insight into molecular systems at high spatial and temporal resolutions.
+However, a key limitation for MD with accurate all-atom force-fields remains
+the computational demand for simulating processes with long timescales. In
+particular, biologically relevant processes, such as protein folding and
+conformational changes, typically require simulation time in excess of
+milliseconds, while atomic-resolution MD trajectories can currently reach
+timescales on the order of microseconds on standard computational resources. 
+
+
+
+This thesis is about solving the challenge of accurately determining the confomational dynamics of high-dimensional stochastic systems. This challenge of high-dimensional stochastic dynamics   
+adaptive sampling of conformational dynamics, a method to efficiently obtain relevant information about the stationary and kinetic behavior of high-dimensional stochastic dynamics. This methods is especially usefull in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge which limits our understanding of the behavior of many systems. This includes the majority of biological processes.
+\RED{expand}
+adaptive sampling is one layer on top 
+of other tool. such as dimension reduction
+
+
+
+\section{Outline}
+ 
+Overall this Dissertation resulted in several peer-reviewed publications \cite{Adstrategies2018, Extasy2016}, as well one publication under review \cite{Extasy2019}. The results obtained during my dissertation as well the results in the papers will be presented in the next chapters.
+ 
+Chapter \label{sec:background} will summarize some of the standard techniques, which will be used frequently throughout the thesis. While some of these approaches are commonly used in this field, there are also recently developed techniques which are less commonly used. The relevence of all these techniques for adaptive sampling will be highlighted. 
+
+The theory of Adaptive sampling will be discussed in Chapter \label{ch:chapter3}, as well the derivation of the first upper limit of the adaptive sampling speed up will be show. This novel result shows that adaptive sampling can be further improved. 
+In the next chapter \label{ch:chapter32} the current strategies will be compared in statistically robust way and the effectivity of each strategy will be compared for different proteins and different goals.
+
+Chapter \label{ch:chapter4} will introduce the computational tools and software frame works necessary to successfully and efficiently execute adaptive sampling. Due to the many subtasks adaptive sampling consists off, these practical consideration have a direct impact on the viability of adaptive sampling for solving sampling problems.
+
+This developed software framework will be used in Chapter \label{ch:chapter5} to show for different biomolecular systems the results and the accuracy which adaptive sampling can achieve. 
+
+A final chapter \label{ch:conclude} will summarize the current achievements and discuss further open questions and possible directions.
+
+
+\afterpage{\null\newpage}
+\chapter{Background\label{sec:background}}
 
 \section{Biomolecules}
-\label{sec:MD}
+
 \GRE{ 
 The behavior of a protein or any biomolecule can be represented by the xyz positions and velocities of all the . T}
 \RED{nice pic protein disease}
@@ -18,11 +52,22 @@ The behavior of a protein or any biomolecule can be represented by the xyz posit
 
 \section{Proteins and Molecular Dynamics (MD)}
 \label{sec:MD}
-\GRE{ 
-The behavior of a protein or any biomolecule can be represented by the xyz positions and velocities of all the . T}
+\GRE{ The behavior of a protein or any biomolecule can be represented by the xyz positions and velocities of all the . T}
 \RED{ image protein xyz}
 check lorenzo chapter 1
 
+The graphics cards can currently simulate almost 1 microsecond of MD trajectory per day of simulation time for smaller proteins. The Special purpose hardware can simulate up to 100 microseconds of MD trajectory per simulation day, but the major limitation of the special-purpose hardware is the very limited access to these machines. 
+
+\section{TICA}
+dimension reduction
+check  lorenzo chapter 2
+
+
+
+\section{MSM}
+check  lorenzo chapter 2
+mfpt
+eigenvectors
 
 \section{energy landscape }
 energy landscape 
@@ -31,15 +76,6 @@ focker planck equation
 \section{Sampling Problem}
 check  lorenzo chapter 1
 
-\section{TICA}
-dimension reduction
-check  lorenzo chapter 2
 
 \section{vampnet intro}
 vampnet intro
-
-\section{MSM}
-check  lorenzo chapter 2
-mfpt
-
-\section{Outline}
