@@ -2,10 +2,7 @@
 \chapter{Adaptive Sampling Theory\label{ch:chapter3}}
 
 
-In this chapter, we investigate the theory of Adaptive Sampling with the goal to better understand the possibilities and limits of adaptive sampling. The results stated here were originally published in paper  including the figures in this chapter.
-\RED{expand}
-
-The material in this chapter was first published in: 
+In this chapter, we investigate the theory of Adaptive Sampling with the goal to better understand the possibilities and limits of adaptive sampling. The results stated here were originally published in paper  including the figures in this chapter. The material in this chapter was first published in: 
 
 \cite{Adstrategies2018} \textbf{Hruska, E.}; Abella, J. R.; N\"uske, F.;
 Kavraki, L. E.; Clementi, C.; Quantitative
@@ -27,7 +24,7 @@ Another approach, incentivized by the increase in parallelization of High-Perfor
 
 Monte Carlo is a commonly used to improve the simulations of many stochastic systems. Here the sampling in not constrained to a hypersurface of conserved Hamiltonians, as is the case of molecular dynamics. This allows Monte Carlo to perform large jump in configuration space which is impossible in molecular dynamics. The high dimensionality of biomolecular systems reduces the effectivity of Monte Carlo Simulations which doesn't represent well the collective motions of biomolecules. The approach of Hybrid Monte Carlo attempts to combine the strength of both Monte Carlo and MD, by including information of the intermolecular forces in the Monte Carlo moves. This approach is promising, but wasn't yet able to increase the time-scales reachable. 
 
-\RED{ chekc if replica exhcange fits in this group, extracte hamiltonian e}
+
 
 Altering the system's Hamiltonian is an approach common to multiple individual sampling methods. The common idea is modifying the Hamiltonian can lead to faster transitions and sampling and the stationary distribution for the original Hamiltonian can be extracted by subtracting the change in the Hamiltonian. In this class are approaches such as metadynamics \cite{laio2008metadynamics}, accelerated MD\cite{hamelberg2004accelerated}, replica-exchange MD \cite{sugita1999replica}. With these approaches the accurate kinetic information or conformational behavior cannot be directly extracted. Recently approaches such as Path reweighting methods \cite{pathreweight1, pathreweight2, pathreweight3, pathreweight4} have been introduced to help with the recovery of the dynamics, but haven't been widely used.
 
@@ -38,7 +35,32 @@ weber2011characterization, Fabritiis-2014, preto2014fast, doerr2016htmd,
 AdaptivePELE-Lecina2017, EvolutionCoupling-Shamsi2017, FAST-Bowman-2015, 
 Strategies-erros-reduce, plattner2017complete} and in the effectivity of different \emph{adaptive sampling strategies} will be investigated. At the end of adaptive sampling all the molecular dynamics trajectories are analyzed together which lead to the deside improved sampling or increased timescales obtainable. 
 
-\RED{ plot adaptive sampling}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures3/branching_picture.pdf}
+  \caption{branching adaptive sampling}
+  \label{fig:branching}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\linewidth]{figures3/NN.png}
+  \caption{NN}
+  \label{fig:NN}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures3/rare_transition.pdf}
+  \caption{rare transition}
+  \label{fig:rare transitions}
+\end{figure}
+
+
 The choide \emph{adaptive sampling strategies}
 At each iteration, all of the simulations that have been performed at that
 point are pooled and analyzed. New simulations are then initialized by

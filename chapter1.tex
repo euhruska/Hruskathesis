@@ -56,12 +56,78 @@ The behavior of a protein or any biomolecule can be represented by the xyz posit
 \RED{ image protein xyz}
 check lorenzo chapter 1
 
+The standard tool to access all of this information is Molecular Dynamics (MD), which is
+the science of simulating motion of a system of particles according to Newton’s classical
+equations of motion.
+The time evolution of a system of N atoms obeys the following Cauchy problem:
+
+X 2 R3N denotes the full Cartesian vector of the system
+
+
+$$M\ddot{X_{t}}=-\nabla U(x_{t})$$
+
+$$U_{CHARMM}=U_{bonds}+U_{angle}+U_{dihedral}+U_{improper}+U_{UB}+U_{LJ}+U_{elec}$$
+
+equation for charmm22
+\begin{equation}
+\begin{aligned}
+U(r_{i})={} &\sum_{bonds}K_{b}(b-b_{0})^{2}+\sum_{angles}K_{\theta}(\theta-\theta_{0})^{2}+\sum_{torsions}K_{\phi}\left(1+cos(n\phi-\delta)\right)\\
+&+\sum_{impropers}k_{\omega}\left(\omega-\omega_{0}\right)^{2}+\sum_{Urey-Bradley}k_{u}\left(u-u_{0}\right)^{2}\\
+&+\sum_{nonbonded}\epsilon\left[\left(\frac{R_{min,ij}}{r_{ij}}\right)^{12}-\left(\frac{R_{min,ij}}{r_{ij}}\right)^{6}\right]+\sum_{electric}\frac{q_{i}q_{j}}{\epsilon r_{ij}}
+\end{aligned}
+\end{equation}
+
 The graphics cards can currently simulate almost 1 microsecond of MD trajectory per day of simulation time for smaller proteins. The Special purpose hardware can simulate up to 100 microseconds of MD trajectory per simulation day, but the major limitation of the special-purpose hardware is the very limited access to these machines. 
 
 \section{TICA}
 dimension reduction
 check  lorenzo chapter 2
+page 188, b./3
 
+scale sqaure rrot
+
+koppman approcimation
+
+
+Time-lagged Independent Component Analysis (TICA) [100, 109, 110] is a dimensionality
+reduction method that can be considered as a special case of the application of the
+variational principle presented above. In practice, given MD data, TICA performs a variational
+optimization using a set of input molecular features yi(xt) (such as atomic positions,
+distances, dihedral angles and combinations of those, . . . ) and defining mean-free basis
+functions as
+$$f_{t}=F\left(x_{t}-\left\langle x_{t}\right\rangle \right)$$
+These
+
+variational principle for conformational dynamics (VAC)
+
+
+\section{vampnet intro}
+vampnet intro
+
+
+xy trajectory
+$$x_{t}$$
+
+features
+$$f_{t}$$
+
+dimension reduced trajeory
+
+$$o_{t}$$
+
+$$C_{01}=\ensuremath{\mathbb{E}}_{t}\left[o_{t}o_{t+\tau}\right]$$
+loss function
+$$L=\left\Vert C_{00}^{-1/2}C_{01}C_{11}^{-1/2}\right\Vert ^{2}$$
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\linewidth]{figures3/NN.png}
+  \caption{NN}
+  \label{fig:NN}
+\end{figure}
+
+
+crossvalidation  - lorenzo fig5 6.1
 
 
 \section{MSM}
@@ -69,13 +135,19 @@ check  lorenzo chapter 2
 mfpt
 eigenvectors
 
+markovian property
+
+implied timescales equation 3.12
+
 \section{energy landscape }
 energy landscape 
 folding funnel
 focker planck equation
-\section{Sampling Problem}
-check  lorenzo chapter 1
+
+Boltzmann distribution - lornezo
+lronzeo fig 7.6
+
+state space
 
 
-\section{vampnet intro}
-vampnet intro
+[12]
