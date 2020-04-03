@@ -2,138 +2,82 @@
 \chapter{Adaptive Sampling Theory\label{ch:chapter3}}
 
 
-In this chapter, we investigate the theory of Adaptive Sampling with the goal to better understand the possibilities and limits of adaptive sampling. The results stated here were originally published in paper  including the figures in this chapter. The material in this chapter was first published in: 
+In this chapter, we investigate the theory of Adaptive Sampling with the goal to better understand the possibilities and limits of adaptive sampling. The results stated here were originally published in: 
 
 \cite{Adstrategies2018} \textbf{Hruska, E.}; Abella, J. R.; N\"uske, F.;
-Kavraki, L. E.; Clementi, C.; Quantitative
+Kavraki, L. E. \& Clementi, C.; Quantitative
 comparison of adaptive sampling methods
-for protein dynamics. J. Chem. Phys.
-2018, 149 
-
+for protein dynamics. J. Chem. Phys. 149 (2018) 
 
 \section{Sampling Problem}
 
-X
-typical tiem steps 2-5fs, with GPUS below 1 microsecond/day paralelliazation
-
-Anton cite for small system up to 100microseconds/day
-
-timescales  
-for biomolecus protein folding and other global strc
-other global structural rearrangements of the order of
-$$10^{-1}$$ - $$10^1$$s.
-As a matter of fact, dynamics Eq. (1.1) naturally spends the vast majority of the time in
-stable regions of the configuration space, i.e., energy minima. Crossing a barrier to get into
-an adjacent minimum is energetically not favored, and is an extremely rare event: waiting
-enough time for the event to occur is the only solution to the issue.
-
-
-timescales  
-for biomolecus protein folding and other global strc
-other global structural rearrangements of the order of
-$$10^{-1}$$ - $$10^1$$s.
-
-Slower (rare) processes are associated with crossing high free energy barriers
-(in an appropriate coordinate space) which is likely to take many trials and time to be
-crossed, thus representing the typical bottleneck to MD simulations.
-
-
-Clearly, it is extremely likely that computational resources might not be enough to
-record a sufficiently long trajectory which ensures that minima-trapping eects have not
-compromised a thorough sampling of the system configurational space. Computing power
-should then be redirected toward sampling rare events, in order to minimize the time the
-dynamical exploration spends trapped in the minima: the resulting strategies are known as
-enhanced sampling techniques [33–38].
-
+The stochastic behavior of biomolecules require a good sampling of the process to accurate understand the configurational behavior of the proteins. This sampling can be done by molecular dynamics and for small biomolecules such as peptides this approach reaches an sufficient sampling. Larger biomolecules pose a significantly larger challenge to sample well. One cause are the slow collective motions which have long timescales. Figure~\ref{fig:raretransitions} illustrates that in many cases there are rare transitions across a rare transition barrier. Simulating a longer molecular dynamics trajectory on one side of the barrier leads to good sampling of one side of the barrier, but a low probability of crossing the rare transition barrier. This bottleneck causes a oversampling of the area on one side on the transition barrier.  
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{figures3/rare_transition.pdf}
-  \caption{rare transition}
-  \label{fig:rare transitions}
+  \caption{Rare transitions barriers cause the sampling problem.}
+  \label{fig:raretransitions}
 \end{figure}
+
+Figure~\ref{fig:raretransitions} shows the free energy landscape along on reaction coordinate. The high sampling at the bottom of the free energy wells is cause by the Boltzman distribution which describes the equilibrium probability density of configuration space for biomolecules. The equilibrium probability density $\pi$:
+
+$$\pi(x)~e^{-F(x)/(k_{B}T)}$$
+
+Here $F(x)$ is the free energy at reaction coordinate point $x$. The limited computational resources make the long simulation times to sample the whole phase space of the biomolecules suboptimal. The computing power could be redirected to sample the rare transition barrier or the undersampled side of the transition barrier. For proteins the rare transition barrier could be protein folding or other large-scale configurational changes.
 
 
 \section{\label{sec:intro2}Alternative sampling approaches}
 
-
-The prevalent challenge of accurate sampling of the dynamics of high-dimensional stochastic systems  has led to many approaches, besides adaptive sampling.
+The sampling problem as well the desire to accurately sampling of the dynamics of high-dimensional stochastic systems has led to many approaches, besides adaptive sampling.
 These efforts can be broadly categorized, but this summary can not exhaustively discuss all approaches due to the large number of these approches.
 One approach, is to simulate longer molecular dynamics trajectories by software and hardware approaches. In recent years the utilization of Graphics processing units (GPUs) and the design of special-purpose hardware \cite{shaw2014anton}. The graphics cards can currently simulate almost 1 microsecond of MD trajectory per day of simulation time for smaller proteins. The Special purpose hardware can simulate up to 100 microseconds of MD trajectory per simulation day, but the major limitation of the special-purpose hardware is the very limited access to these machines. A important role also played software advances which can effectively utilize these hardware. Despite all the improvements, these approaches perform simple molecular dynamics simulations and don't utilize the any additional possibilities of reaching longer timescales.
 
 Another approach, incentivized by the increase in parallelization of High-Performance Computers is the simulation of many simultaneous trajectories \cite{DistComp-Shirts2000, DistComp-Buch2010}. The sampling is performed in parallel for the same system and by analyzing the resulting trajectories a better sampled result is obtained.  As shown in Chapter 4 the total efficiency of sampling is reduced due to the independend nature of the sampling, but the absolute simulation time or the time to solution is reduced.
 
-Monte Carlo is a commonly used to improve the simulations of many stochastic systems. Here the sampling in not constrained to a hypersurface of conserved Hamiltonians, as is the case of molecular dynamics. This allows Monte Carlo to perform large jump in configuration space which is impossible in molecular dynamics. The high dimensionality of biomolecular systems reduces the effectivity of Monte Carlo Simulations which doesn't represent well the collective motions of biomolecules. The approach of Hybrid Monte Carlo attempts to combine the strength of both Monte Carlo and MD, by including information of the intermolecular forces in the Monte Carlo moves. This approach is promising, but wasn't yet able to increase the time-scales reachable. 
+Monte Carlo is a commonly used to improve the simulations of many stochastic systems. Here the sampling in not constrained to a hypersurface of conserved Hamiltonians, as is the case of molecular dynamics. This allows Monte Carlo to perform large jump in configuration space which is impossible in molecular dynamics. The high dimensionality of biomolecular systems reduces the effectivity of Monte Carlo Simulations which doesn't represent well the collective motions of biomolecules. The approach of Hybrid Monte Carlo attempts to combine the strength of both Monte Carlo and MD, by including information of the intermolecular forces in the Monte Carlo moves. This approach is promising, but wasn't yet able to reach longer timescales for biomolecules than other approaches. 
 
 
-X
-Altering the system's Hamiltonian is an approach common to multiple individual sampling methods. The common idea is modifying the Hamiltonian can lead to faster transitions and sampling and the stationary distribution for the original Hamiltonian can be extracted by subtracting the change in the Hamiltonian. In this class are approaches such as metadynamics \cite{laio2008metadynamics}, accelerated MD\cite{hamelberg2004accelerated}, replica-exchange MD \cite{sugita1999replica}. With these approaches the accurate kinetic information or conformational behavior cannot be directly extracted. Recently approaches such as Path reweighting methods \cite{pathreweight1, pathreweight2, pathreweight3, pathreweight4} have been introduced to help with the recovery of the dynamics, but haven't been widely used.
-
+Modifying the Hamiltonian of the biomolecules is another common approach to solving the sampling problem. Here the Free energy barrier is reduced by adding terms to the original Hamiltonian of the biomolecules.
+The reduced free energy barrier lead to shorter timescales necessary to sample the modified Hamiltonian. Different approaches such as metadynamics \cite{laio2008metadynamics} or accelerated MD\cite{hamelberg2004accelerated} are possible. The stationary probability distribution can be recovered according to the Boltzman distribution. Accurate kinetic information or conformational dynamics cannot be measured directly. Recent methods in recovering the kinetic information\cite{pathreweight1, pathreweight2, pathreweight3, pathreweight4} are investigated, but haven't been widely used. 
 
 \section{\label{sec:intro2}Adaptive sampling approach}
 
-The general idea of \emph{adaptive sampling} is the ``divide and conquer`` approach. Simulating shorter molecular dynamics trajectories allows to change the restarting points for the next short molecular dynamics trajectories. The choice of this restarting points is a key element of this thesis. Multiple approaches or \emph{adaptive sampling strategies} have been proposed before \cite{singhal2005error, bowman2010enhanced,
-weber2011characterization, Fabritiis-2014, preto2014fast, doerr2016htmd,
-AdaptivePELE-Lecina2017, EvolutionCoupling-Shamsi2017, FAST-Bowman-2015, 
-Strategies-erros-reduce, plattner2017complete} and in the effectivity of different \emph{adaptive sampling strategies} will be investigated. At the end of adaptive sampling all the molecular dynamics trajectories are analyzed together which lead to the deside improved sampling or increased timescales obtainable. 
 
 
+The general idea of \emph{adaptive sampling} is the ``divide and conquer`` approach. Simulating shorter molecular dynamics trajectories allows to change the restarting points for the next short molecular dynamics trajectories. The choice of this restarting points is a key element of this thesis. Figure~\ref{fig:branching} illustrated that the free choice of restarting points allows to clone configurations and sample certain areas of the energy landscape better. The black crosses in the figure indicate areas where sampling is blocked, reducing the utilization of computational resources in some areas.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.9\linewidth]{figures3/branching_picture.pdf}
-  \caption{branching adaptive sampling}
+  \includegraphics[width=0.6\linewidth]{figures3/branching_picture.pdf}
+  \caption{Restarting method in adaptive sampling strategies.}
   \label{fig:branching}
 \end{figure}
 
 
 
-
-
-
-The choide \emph{adaptive sampling strategies}
-At each iteration, all of the simulations that have been performed at that
-point are pooled and analyzed. New simulations are then initialized by
-using the information extracted from the analysis of the previous iterations.
-The main idea of adaptive sampling is that, by periodically analyzing the
-conformational space already explored, new simulations can be restarted 
-in a way that may significantly enhance the probability of observing rare
-events. The choice of the strategy chosen to restart the trajectories is crucial
-to the success of the approach, and several different methods have been
-proposed \cite{weber2011characterization, Fabritiis-2014,
-AdaptivePELE-Lecina2017,preto2014fast, doerr2016htmd,roblitz2013fuzzy,
-weexplore, WESTPA-Zwier2015}.weber2011characterization
-Recently, enhanced sampling in combination with adaptive sampling methods has
-also been proposed~\cite{pathreweight5}.
-
-
-
-
- distributing them in a way to 
-escape from local free energy minima, and efficiently visit different regions of
-the conformational space of the systems of interest.
-
 The advantage compared to other non-adaptive sampling strategies is the combination of accurate dynamics results and improved timescales reachable.
 
-One common step of adaptive sampling is the necessity to 
 
- In the last decade, different methods have been
-put forward to extract essential information from high dimensional MD data to a
-small number of reaction coordinates associated with the slow
-collective processes in the system's dynamics \cite{rohrdanz2013discovering,
-noe2017collective}. Such methods include Markov State Models (MSMs) \cite{prinz2011markov,
-MSM-Pande-2018,bookmsm,masterequationsMSM,SCHUTTE1999146}, Diffusion Maps
-\cite{Coifman7426, rohrdanz2011determination,Zheng2011, Boninsegna2015}, likelihood based approaches
-\cite{peters2006obtaining}, cut-based free energy profiles
-\cite{krivov2008diffusive}, or neural networks \cite{Mardt2018,wehmeyer2018time,
-ribeiro2018reweighted}.  
 
-In particular, MSMs provide a good complement for
-adaptive sampling as they are designed to handle many short trajectories and
-do not require an equilibrium sampling to recover global thermodynamics and
-kinetic properties (such as metastable states, free energy barriers, and
-transitions between states), as long as the trajectories are in local
-equilibrium.  
+
+One method of reducing both the computational resources and the simulation times is \emph{adaptive sampling} \cite{singhal2005error, bowman2010enhanced,
+weber2011characterization, Fabritiis-2014, preto2014fast, doerr2016htmd,
+AdaptivePELE-Lecina2017, EvolutionCoupling-Shamsi2017, FAST-Bowman-2015, 
+Strategies-erros-reduce, plattner2017complete, Adstrategies2018}. 
+Adaptive sampling is an iterative process, where MD simulations from previous
+iterations are analyzed, and, based on the analysis, a new iteration of relatively
+short MD trajectories is initiated. The starting conformations for the
+MD trajectories are determined in such a way to efficiently
+reach a goal such as crossing rare transitions barriers, folding a protein, or
+recovering the dynamics of a macromolecule. The exact strategy where to restart
+new MD simulations determines the success of the adaptive sampling approach,
+and several different methods have been proposed and investigated\cite{Fabritiis-2014,
+AdaptivePELE-Lecina2017, preto2014fast, doerr2016htmd,
+weexplore, prattWESTPAAdvancesSampling2018, Adstrategies2018, FUNN, FAST}. One approach is to select new restarting configurations based on the PCA projection of the already sampled configurations \cite{shkurti2019jctc,harada2015jctc,harada2017jctc}. Adaptive sampling
+requires to use multiple parallel simulations and is therefore suitable for
+High-Performance Computers (HPC).
+
 
 As mentioned above, different adaptive sampling methods can be characterized by how the
 information extracted from previously explored space is used to
@@ -169,62 +113,63 @@ profiles \cite{krivov2008diffusive}, or neural networks
 \cite{Mardt2018,wehmeyer2018time, ribeiro2018reweighted}. 
 
 
-In each iteration of Markov State Models-based adaptive sampling, all previous
-MD simulations are analyzed.
-Figure~\ref{fig:schema} is a graphical representation of the process. In the
-first iteration of the adaptive sampling, the MD simulations are generated from
-the system starting state as shown in Step 1.
-
-In Step 2 all previous trajectories are analyzed. The first step is dimension reduction. One dimension reduction approach is using Time-lagged
-Independent Component Analysis (TICA) \cite{TICA1-perez2013, TICA2-schwantes2013} converts the raw trajectories in
-low-dimensional trajectories. The Koopman method \cite{koopmanold,
-koopman2,koopman3,koopman4, wu2017variational, Nueske2017} is used to reduce
-the non-equilibrium effects emerging from collecting many short MD trajectories. The
-resulting low-dimensional trajectories are scaled into a kinetic map
-\cite{Noe2015,noe2016commute}, which provides a measure of the kinetic distance
-between different configurations. Another dimension reduction approach implemented by default in ExTASY is a deep learning approach with state-free reversible VAMPnets (SRV) \cite{Mardt2018,chen2019jcp}. The SRVs can effectively achieve non-linear dimension reductions. The SRV originates from the same variational
-approach to conformational dynamics as TICA. The trajectory and the time-lagged trajectories are transformed with a neural network into dimension reduced trajectories. The dimension reduced trajectories are then used to calculate the VAMP-2 score, which is used as the loss function for the backpropagation to optimize the parameters of the neural network. The non-linear dimension reduction achieved with SRV improves the separation of different states. On advantage of SRVs is that SRVs can reach the same accuracy for time scales with shorter lag times than TICA. For adaptive sampling, the shorter lag time for analysis allows increasing the frequency of restarting trajectories which potentially improves adaptive sampling. In this case, the length of MD trajectories in each iteration is reduced and the number of iterations is increased.
-
-The dimension reduced trajectories are then clustered with k-means into approximately 200 microstates,
-the detailed values for each protein are provided in the Supplementary Information. 
-A  maximum-likelihood estimation with a detailed balance
-constraint \cite{prinz2011markov} allows obtaining an MSM transition matrix 
-between every pair of microstates. All the analysis was
-performed using the PyEMMA Python package \cite{scherer2015pyemma}, which
-allows fast adjustments in the analysis step. The exact parameters for the MSM
-construction for each protein are listed in the
-Supplementary Information. All these steps can be modified or replaced easily in the
-ExTASY workflow. 
-
-Molecular dynamics (MD) simulations with all-atom force-fields allow simulating
-protein folding and protein kinetics with good accuracy. Reaching biologically
-relevant processes, such as protein folding or drug binding, is limited mainly
-by the required large computational resources and long simulation times. The
-long simulation times can be reduced either by simulating parallel trajectories
-with massively-distributed computing \cite{DistComp-Shirts2000,
-DistComp-Buch2010} or with special-purpose hardware \cite{shaw2014anton}.
-Further reduction of required computational resources or simulation times would
-allow a more broad application of MD simulations.
-
-One method of reducing both the computational resources and the simulation times is \emph{adaptive sampling} \cite{singhal2005error, bowman2010enhanced,
+Multiple approaches or \emph{adaptive sampling strategies} have been proposed before \cite{singhal2005error, bowman2010enhanced,
 weber2011characterization, Fabritiis-2014, preto2014fast, doerr2016htmd,
 AdaptivePELE-Lecina2017, EvolutionCoupling-Shamsi2017, FAST-Bowman-2015, 
-Strategies-erros-reduce, plattner2017complete, Adstrategies2018}. 
-Adaptive sampling is an iterative process, where MD simulations from previous
-iterations are analyzed, and, based on the analysis, a new iteration of relatively
-short MD trajectories is initiated. The starting conformations for the
-MD trajectories are determined in such a way to efficiently
-reach a goal such as crossing rare transitions barriers, folding a protein, or
-recovering the dynamics of a macromolecule. The exact strategy where to restart
-new MD simulations determines the success of the adaptive sampling approach,
-and several different methods have been proposed and investigated\GRE{\cite{Fabritiis-2014,
-AdaptivePELE-Lecina2017, preto2014fast, doerr2016htmd,
-weexplore, prattWESTPAAdvancesSampling2018, Adstrategies2018, FUNN, FAST}. One approach is to select new restarting configurations based on the PCA projection of the already sampled configurations \cite{shkurti2019jctc,harada2015jctc,harada2017jctc}.} Adaptive sampling
-requires to use multiple parallel simulations and is therefore suitable for
-High-Performance Computers (HPC).
+Strategies-erros-reduce, plattner2017complete} and in the effectivity of different \emph{adaptive sampling strategies} will be investigated. 
 
 
-\RED{ this section ok}
+escape from local free energy minima, and efficiently visit different regions of
+the conformational space of the systems of interest.
+
+
+Recently, enhanced sampling in combination with adaptive sampling methods has
+also been proposed~\cite{pathreweight5}.
+
+
+
+
+
+
+
+analysisi
+
+At each iteration, all of the simulations that have been performed at that
+point are pooled and analyzed. New simulations are then initialized by
+using the information extracted from the analysis of the previous iterations.
+The main idea of adaptive sampling is that, by periodically analyzing the
+conformational space already explored, new simulations can be restarted 
+in a way that may significantly enhance the probability of observing rare
+events. The choice of the strategy chosen to restart the trajectories is crucial
+to the success of the approach, and several different methods have been
+proposed \cite{weber2011characterization, Fabritiis-2014,
+AdaptivePELE-Lecina2017,preto2014fast, doerr2016htmd,roblitz2013fuzzy,
+weexplore, WESTPA-Zwier2015}.
+
+ In the last decade, different methods have been
+put forward to extract essential information from high dimensional MD data to a
+small number of reaction coordinates associated with the slow
+collective processes in the system's dynamics \cite{rohrdanz2013discovering,
+noe2017collective}. Such methods include Markov State Models (MSMs) \cite{prinz2011markov,
+MSM-Pande-2018,bookmsm,masterequationsMSM,SCHUTTE1999146}, Diffusion Maps
+\cite{Coifman7426, rohrdanz2011determination,Zheng2011, Boninsegna2015}, likelihood based approaches
+\cite{peters2006obtaining}, cut-based free energy profiles
+\cite{krivov2008diffusive}, or neural networks \cite{Mardt2018,wehmeyer2018time,
+ribeiro2018reweighted}.  
+
+In particular, MSMs provide a good complement for
+adaptive sampling as they are designed to handle many short trajectories and
+do not require an equilibrium sampling to recover global thermodynamics and
+kinetic properties (such as metastable states, free energy barriers, and
+transitions between states), as long as the trajectories are in local
+equilibrium.  
+
+At the end of adaptive sampling all the molecular dynamics trajectories are analyzed together which lead to the deside improved sampling or increased timescales obtainable. 
+
+
+
+
+\red{ this section is ok}
 \section{\label{sec:design}ExTASY schematics}
 
 This complexity of utilizing different software frameworks can detract from applying adaptive sampling or researching novel adaptive sampling methods. One method to reduce this complexity is to build the software in a modular approach. For ExTASY the modularity starts from splitting the adaptive sampling into individual steps shown in Figure~\ref{fig:schema2}.
@@ -248,12 +193,9 @@ The individual adaptive sampling steps are summarized as follows:
 
 The beginning step of any adaptive sampling is the initialization. The start configuration from where the adaptive sampling is launching is chosen. For each replica, which depends on the parallelization of the computational resource, a configuration is generated. The start configuration can be all identical or disparate. For proteins commonly a unfolded state is chosen.
 In step 1 the MD simulations for all replicas is performed in a parallelized mode. Here most of the computational resources are utilized and scalability of this step is crucial. Commonly  
-Following the MD simulation is the analysis of the MD trajectories in step 2. In ExTASY the flexibility python scripts allow the simple implementation and modification of different analysis strategies, including deep learning approaches\cite{Mardt2018}. In the following Chapters 5 and 6 the adaptive sampling strategies $cmicro$ and $cmacro$ with Markov State Models \cite{prinz2011markov} are used as described in Chapter 3. 
+Following the MD simulation is the analysis of the MD trajectories in step 2. In ExTASY the flexibility python scripts allow the simple implementation and modification of different analysis strategies, including deep learning approaches\cite{Mardt2018}. In the following Chapters 5 and 6 the adaptive sampling strategies $cmicro$ and $cmacro$ with Markov State Models \cite{prinz2011markov} are used as described in this Chapter. 
 
 The results of Step 2 allow to determine in Step 3 if the objectives of adaptive sampling are reached. Examples for the objectives are protein folding, achieving a certain accuracy in protein dynamics or exploration of a part of the energy landscape corresponding to a smaller-scale motion of the protein. If the objective is not reached, Step 4 creates the restartings configuration for the next MD trajectories corresponding to Step 1. The adaptive sampling strategies to determine the restarting points in Step 4 in Figure~\ref{fig:schema2} are easily exchangeable, such as the strategies discussed in Chapter 2 or the FAST method \cite{FAST}. Once the objective in Step 3 is reached, adaptive sampling finishes and all trajectories can be further analyzed. 
-
-
-
 
 
 
@@ -422,37 +364,33 @@ In real simulations such an optimization of the parameters is not
 possible, but we perform it here to estimate the upper bound for the speed up.
 
 
+\RED{above}
 \section{Upper limits to adaptive sampling strategies}
 
-\subsection{$p_{esc}$ - Optimal strategy for exploration}
-We also test a strategy that is not feasible in practice but offers a baseline
-comparison as a theoretically optimal one. This strategy is built by using knowledge
-of the full transition matrix of the system, that is not a priori known in real
-applications (it is usually the goal of the sampling).
-For each visited microstate $i$, we
-compute the probability to transition to any microstate not yet explored using
-the true transition matrix:
-%
-$$p_{esc}[i]=\sum_{j \in unexplored}T[i, j]$$
-%
-The state with the highest $p_{esc}$ value is chosen as the restart state. As stated above,
-this strategy is impossible to implement in practice for real protein
-simulations, but it is as a useful benchmark for comparing adaptive sampling
-strategies that aim to explore conformational space.
+\subsection{Optimal strategy for exploration: $p_{esc}$}
 
-\subsection{$t_{opt}$ - Optimal strategy to speedup slow processes (protein folding)} 
-We also test another theoretically optimal strategy given perfect knowledge of the
-system dynamics as well as knowledge of the folded states. In a way that is
-similar to the definition of mean first passage time \cite{mfptbook},
-for each state $i$ in the MSM, we compute a value $t_{opt}[i]$ which 
-estimates the minimal time to reach the folded state.
-We first define that for each folded state $f$, $t_{opt}[f] = 0$. Then we
-iteratively solve the following recurrence relation for each state $i$ outside the folded region:
-%
-$$t_{opt}[i]=1+\sum_{j \in states}T[i,j]min(t_{opt}[i],t_{opt}[j])$$
-%
-The equation is solved iteratively until the relative change in $t_{opt}$ drops
-below a cutoff. We then use it to define a benchmark restart strategy, by
+One objective for adaptive sampling is the optimal exploration of all states. This objective is relevant when the whole energy landscape has to be explored with no dominat slow processes. 
+An upper limit for can be derived when assuming that the full transition matrix for the protein investigated is known. The full transition matrix is not generally known and limits this strategy only as an upper limit speed of exploration. No adaptive sampling strategy can explore all the states faster. This approach assumes that the transition matrix represents the protein accurately.
+First, we calculate for each visited microstate $i$ the probability of transition to any microstate which is not explored yet.
+
+$$p_{esc}[i]=\sum_{j \in unexplored}T[i, j]$$
+
+For this optimal strategy, the next restarting configuration is chosen from the state with the highest $p_{esc}$. The performance of this upper limit on exploration speed in investigated in Chapter 4.
+
+\subsection{Optimal strategy for protein folding: $t_{opt}$} 
+
+Many biomolecules have significant transition barriers which cause slow collective motions. Here the objective is to optimally cross the transition barrier.
+The problem can be rephrased as mean optimal time to reach any state in the ensemble  $s_1$. Frequently this ensemble of states is the folded state.  
+Similarly to the $p_{esc}$ strategy we assume the full transition matrix for the protein is known. As the first step we designate the mean optimal time to reach $s_1$ from state $i$ as $t_{opt}[i]$.
+For every state in $s_1$ the value of  $t_{opt}[i]$ is zero.
+
+All these $t_{opt}[i]$ values have interdependencies caused by our knowledge of the full transition matrix:
+
+$$t_{opt}[i]=\sum_{j \in states}T[i,j]min(t_{opt}[i],t_{opt}[j])+1$$
+
+This equation has two parts. The first part represents the restarting of the adaptive sampling in the current state $i$. According to the transition probability the next steps would be state $j$. The new state $j$ is only accepted if the mean optimal time of state $j$ is lower than the current state. All previously explored states with higher $t_{opt}$ are insignificant, since the optimal strategy choses only the state with mean optimal time. The addition of 1 is caused by the one restarting iteration in the first part. The result is in units of restarting steps. The above equation can be solved numerically. The performance of this strategy $t_{opt}$ defining the upper limit on folding speed is investigated in Chapter 4.
+
+We then use it to define a benchmark restart strategy, by
 selecting the restart state among the ones explored that has the lowest
 $t_{opt}$ value, representing the state that is the closest to the folded
 state. Note again that this strategy is impossible to implement in
@@ -462,8 +400,8 @@ sampling for the folding of a protein can be evaluated.
 
 
 \section{\label{sec:methods}Discussion}
-preformance comparison ptomal to  othe strategies in next cahper
 
+The two new upper limits on adaptive sampling speed up allow for an increased understanding of adaptive sampling strategies, continued in Chapter 4. Without any theoretical upper limit the potential of adaptive sampling is unknown. The equations show that the potential of adaptive sampling depend on the transition matrix, which changes with each protein. Adaptive sampling strategies will be more effective when following the restarting decisions of $t_{opt}$ benchmark under the constrain of no \emph{a priori} knowledge of the transition probabilities.
 
 
 
