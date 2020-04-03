@@ -2,7 +2,7 @@
 \chapter{Aplication of adaptive sampling\label{ch:chapter5}}
 
 The development of an effective, scalable software platform in Chapter 5 allows us to execute adaptive sampling for larger application and larger proteins.
-In this chapter adaptive sampling will be used to determine the folding and the conformational dynamics of 4 proteins. These results allows us to compare the effeciency and accuracy of adaptive sampling compared with plain molecular dynamics.  These 4 proteins range from 10 residues to 72 residues. The computational resources available limited the application to these small, fast folding proteins. 
+In this chapter adaptive sampling will be used to determine the folding and the conformational dynamics of 4 proteins. These results allows us to compare the effeciency and accuracy of adaptive sampling compared with plain molecular dynamics.  These 4 proteins range from 10 residues to 73 residues. The computational resources available limited the application to these small, fast folding proteins. 
 
 The material in this chapter was first published in following paper: 
 \\*
@@ -10,43 +10,24 @@ The material in this chapter was first published in following paper:
 and scalable adaptive sampling on supercomputers. arXiv (2019). URL: https://arxiv.org/abs/1907.06954.
 
 
-\section{\label{sec:intro5} Introduction}
+\section{\label{sec:intro5}Introduction}
   
-In Chapter 4 the efficiency and reliability of adaptive sampling strategies was compared in a statistically significant approach.  In that chapter Markov Chain trajectories were utilized to approximate the behavior of molecular dynamics trajectories. Since Markov Chain trajectories can be generated much faster than molecular dynamics trajectories a statistically significant reesults could be achieved. The limitation of this approach is that Markov Chain trajectories are only approximations and full molecular dynamics trajectories are necessary to confirm the performance of adaptive sampling.
+In Chapter 4 the efficiency and reliability of adaptive sampling strategies was compared in a statistically significant approach.  In that chapter Markov Chain trajectories were utilized to approximate the behavior of molecular dynamics trajectories. Since Markov Chain trajectories can be generated much faster than molecular dynamics trajectories a statistically significant reesults could be achieved. The limitation of this approach is that Markov Chain trajectories are only approximations and full molecular dynamics trajectories are necessary to confirm the performance of adaptive sampling. From Chapter 4 we expect a higher speed up with adaptive sampling\cite{Adstrategies2018} compared to plain MD for larger proteins.
 
-From Chapter 4 we expect a higher speed up with adaptive sampling\cite{Adstrategies2018}.
-
-\RED{continue}
-
-reference data
-
-  The results show that some adaptive sampling strategies are
-both reliable, accurate and reach speed ups of one or more orders of magnitude
-compared t} plain MD. For a larger, more complex protein a higher speed up is expected .
+\section{\label{sec:Reference}Reference Data}
 
 
-Determining the efficiency, accuracy, and reliability of a particular adaptive
-sampling strategy is challenging for several reasons. Different proteins can
-behave differently for different adaptive sampling strategies but limited
-computational resources don't allow to adaptively sample a statistically
-significant number of proteins with different strategies for comparison.
-Accurate results are known only for a limited number of proteins. Despite
-these challenges some performance analyzes of adaptive sampling strategies
-have been performed
-\cite{preto2014fast,weber2011characterization,bowman2010enhanced,Fabritiis-2014,
-Adstrategies2018}. 
 
-\subsection{\label{sec:Reference} Reference Data}
+To compare the speed up and accuracy of the adaptive sampling methods compared to plain MD we utilize reference proteins and reference trajectories to compare the results.
+The 4 small proteins have long reference simulations generated on the Anton supercomputer \cite{lindorff2011}, which fold and unfold each of the proteins multiple times. The multiple folding events ensure a well sampled energy landscape and a good accuracy for the reference comparison. To fold and unfold proteins multiple times requires large computational resources, laving only for very limited number of proteins as well sampled reference data with a well sampled energy landscapes and conformational dynamics.
 
 \begin{table}[H]
 \centering
-\caption{Adaptively sampled proteins in this study}
-\label{tab:dataset-summary}
 %\begin{tabular}{ccccc}
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Protein & PDB ID & \# Residues & Folding Time ($\mu$s) \cite{lindorff2011} & Unfolding Time ($\mu$s)\\ 
+Protein & PDB ID & \# of Residues & Folding Time ($\mu$s) \cite{lindorff2011} & Unfolding Time ($\mu$s)\\ 
 \hline
 Chignolin    & 5AWL                       & 10                 & 0.6                &2.2            \\
 Villin       & 2F4K                       & 35                 & 2.8                &0.9            \\
@@ -55,24 +36,64 @@ A3D          & 2A3D                       & 73                 & 27             
 \hline            
 \end{tabular}
 }
+\caption{Proteins for the comparison of adaptive sampling and plain MD. }\label{table:dataset-summary}
 \end{table}
-To show the speed up and accuracy of the adaptive sampling method we \GRE{projected
-the results of the \GRE{4} small proteins on to preexisting long MD simulations}, obtained
-on the Anton supercomputer \cite{lindorff2011}. These proteins and the
-reference data were investigated before \cite{reanalyze1, reanalyze2},
-allowing us to demonstrate here the usefulness and reliability of the ExTASY
-workflow. The \GRE{4} proteins are summarized in Table \ref{tab:dataset-summary},
-their size is \GRE{from 10 to 73 residues and have a short folding time below 40 $\mu$s}.
-These proteins were chosen due to their folding time which is long enough to
-show the advantages of adaptive sampling with ExTASY framework, but still
-reachable with our computational resources. Only the C-alpha coordinates are
-used when comparing the reference data trajectories with the results from the
-ExTASY framework in this work. \GRE{Since parallelization strongly affects the time to fold, we compare the results of adaptive sampling with the results of plain MD with the same number of parallel simulations, starting from the same starting configuration. Bot adaptive sampling and plain MD were executed with the ExTASY platform.}
+The folding and unfolding times of the 4 proteins are shown in Table \ref{tab:dataset-summary}. All the folding times are below 40 $\mu$s, a timescale reachable with the available resources. To compare the adaptive sampling and plain MD we ran for all proteins both methods with ExTASY on the Summit supercomputer. To ensure comparability, the parallelization was the same for adaptive sampling and plain MD.
 
 
-\subsection{\label{sec:MD} Molecular dynamics simulation}
+\section{\label{sec:MD}Setup}
+
+The initialization of both plain MD and adaptive sampling was identical. For the 4 proteins a single start frame was chosen from reference dataset. To ensure this frame was unfolded, random selection was only among the 20\% frames with the highest Root Mean Square Deviation to the
+protein crystal structure. The initial coordinates for ExTASY we obtained after a short energy equilibration (1-2ns) in an NPT ensemble. 
+
+The parameters for the MD simulations were following. The setup of the reference trajectories\cite{lindorff2011} was replicated, with a CHARMM22* force field \cite{Charmm22star}
+and the modified TIP3P water. Table \ref{table:param1} shows the identical temperaturs of the MD simulation to the reference simulations. One difference was the use of the Particle Mesh Ewald method for long-range electrostatics in OpenMM. The MD stepsize was 5fs and 2fs for A3D. The MD was run on OpenMM 7.5 \cite{openMM} using CUDA 9.1.  
+
+For both adaptive sampling and plain MD 50 replicas were used, each replica simulated on one GPU. The MD trajectory lengths were 50ns for Chignolin and Villin, 10ns for BBA and 40 ns for A3D.  The resulting trajectories were strided to reduce the data volume. Two copies of each trajectory were generated. One trajectory stored all information including water and one trajectory stored only the protein coordinates. The protein-only trajectories were used to speed up the analysis, which was limited by the data transfer rate.
+
+
+The analysis for adaptive sampling was run on one GPU in an asynchronous manner as shown in Chapter 5. The parameters for the analysis step of the adaptive sampling strategies were the following.  For dimension reduction deep learning with SRVs was utilized, as introduced in Chapter 2.
+The SRV features were the distances between all pairs of C-alpha atoms. For protein A3D only th distance pairs between every second C-alpha atom were selected due to the larger size of the protein.  For proteins Chignolin, Villin and BBA the SRVs dimension reduction was run with 8 deep learning epochs, 6 hidden layers, size of hidden layers 50, activation tanh, learning rate 1e-4, dropout rate 0.1 and latent space noise 0.1. For the larger protein A3D, the SRV was speed up with following parameter: 1 deep learning epoch, 2 hidden layers, size of hidden layers 160, activation function elu (Exponential linear unit), learning rate 1e-3, dropout rate 0.01 and latent space noise 0.1. The number of SRV output dimensions was 10 for Chignolin and 4 for Villin, BBA and A3D. 
+
+The SRV lag times and MSM lag times are shown in Table \ref{table:param1}. For BBA short lag times wer chosen to investigate the effect of shorter trajectory lengths. These shorter trajectory length were enabled by using SRVs instead of TICA. SRVs reach identical accuracy with shorter time lags than TICA dimension reduction\cite{chen2019jcp}. The number k-means clustering states fro the MSMs was 500 and 200 for protein A3D. For Chignolin and A3D the chosen adaptive sampling strategy was $cmacro$, for Villin and BBA $cmicro$ adaptive sampling strategy was used. For the $cmacro$ strategy 20 macrostates were used.
+
+Once both the adaptive sampling and plain MD was concluded, the exploration and the protein dynamics were compared with the help of the Anton MD reference trajectories. For the final analysis, TICA dimension reduction with kinetic map scaling and Koopman correction was used with a lag time of 10ns or 1.5ns for BBA. The TICA input features were the distances and inverse distances between all pairs of C-alpha atoms. After projection of both the adaptive sampling and plain MD trajectories on the reference trajectories in the TICA space, the exploration and protein dynamics were compared.
+
+\begin{table}[H]
+
+\centering
+%\begin{tabular}{ccccc}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+Protein Name  & MD Temperature [K]  &MD [ns]/iteration  & MD step size [fs] & SRV lag [ns] & MSM lag [ns]    \\ 
+\hline
+Chignolin      & 340 &   50 & 5 &1.5 & 10     \\
+Villin         &   360 & 50 & 5 & 1.5 & 10         \\
+BBA            &   325 &10 & 5 & 1.5 & 1      \\
+A3D            &  370 & 40 & 2 & 10 & 10    \\
+\hline            
+\end{tabular}
+}
+\caption{ExTASY parameters for MD and analysis, for both plain MD and adaptive sampling.  }\label{table:param1}
+\end{table}
+
+
+\section{\label{sec:results}Results}
+
+The three main considerations when comparing adaptive sampling and plain MD were the speed up achieved, exploration of the whole energy landscape and the accuracy of the conformational dynamics.
+The exploration of the whole energy landscape was shown by projecting the adaptive sampling onto the reference trajectories in the TICA space. By measuring the explored fraction of the population of simulation time the speed up compared to plain MD could be determined. The accuracy of the protein dynamics was determined by analyzing the entropy of the MSM transition
+matrices and the Mean First Passage Time (MFPT).
+
+
+
+\subsection{\label{sec:time-fold}Comparison of Exploration}
+
+The high-dimensional nature of the whole energy landscape of biomolecules prevents to visualize and compare the whole energy landscape. Only the dimension reduced free energy landscape of the proteins in TICA coordinates was compared, shown in Figure~\ref{fig:overlap}. The background in color shows the reference free energy landscape of the proteins and the shaded foreground is the area which adaptive sampling successfully explored. For all four proteins, Chignolin, Villin, BBA and A3D, the whole energy landscapes was explored by adaptive sampling, including the folded state. This shows that adaptive sampling not ony folded these proteins, but correctly recovered the energy landscape for these proteins.  The small differences compared to the reference energy landscapes predominantly occour in the rare sampled areas of the energy landscapes. This discrepancy can be explained by the stochasticity of both the adaptive sampling and reference MD simulation. Despide the relatively long data size the stochasticity causes only poor sampling on the energy landscape in some low probability areas of the energy landscapes.  
+
 
 \begin{figure}[H]
+\centering
    \begin{subfigure}[b]{0.6\linewidth}
    {\scalebarimg{figures2/plot_reana_61_extasy_vamp_chignolin3-free-energy-TICA2-overlap_mod.pdf}{0.98}{A)}{0mm}{-2mm}}
    \end{subfigure}%
@@ -81,17 +102,13 @@ ExTASY framework in this work. \GRE{Since parallelization strongly affects the t
    {\scalebarimg{figures2/plot_reana_61_extasy_vamp_villin3-free-energy-TICA2-overlap_mod.pdf}{0.98}{B)}{0mm}{-2mm}}
    \end{subfigure}%
 
-  %%\includegraphics[width=\linewidth]{figures/UVF_7_steps10000_nparallel100_explore.eps}
-  \caption{Exploration of the protein energy landscape in TICA coordinates. The
- color background shows the explored Free Energy landscape by the reference
- dataset. The black diagonal lines on top show the explored conformations by the adaptive
- sampling in this paper. The almost perfect overlap shows that the whole
- conformational landscape of \GRE{all 4 proteins was fully explored. The labels show} the location of the folded state. Individual proteins: A) Chignolin B) Villin }
+
+  \caption{The recovery of the energy landscape by adaptive sampling for 4 proteins. The projection on TICA coordinates is shown. The
+ color background shows the reference Free Energy landscape and the black diagonal lines show the adaptive sampling explored energy landscape. The location of the folded states are shown.  A) Chignolin B) Villin }
 \end{figure}
 
 \begin{figure}[H]\ContinuedFloat
-
-   
+\centering
    \begin{subfigure}[b]{0.6\linewidth}
    {\scalebarimg{figures2/plot_reana_61_extasy_vamp_bba3-cmicro-free-energy-TICA2-overlap_mod.pdf}{0.98}{C)}{0mm}{-2mm}}
    \end{subfigure}%
@@ -100,34 +117,20 @@ ExTASY framework in this work. \GRE{Since parallelization strongly affects the t
    {\scalebarimg{figures2/plot_reana_61_extasy_a3d9-free-energy-TICA2-overlap_mod.pdf}{0.98}{D)}{0mm}{-2mm}}
    \end{subfigure}%
 
-  %%\includegraphics[width=\linewidth]{figures/UVF_7_steps10000_nparallel100_explore.eps}
-  \caption{\GRE{(cont.)} Individual proteins: C) BBA D) A3D} 
+  \caption{(cont.) C) BBA D) A3D} 
   \label{fig:overlap}
 \end{figure}
 
-The MD simulations in this work were performed with \GRE{OpenMM 7.5} \cite{openMM}
-using \GRE{CUDA 9.1 on the Summit supercomputer}. To reproduce the same setup
-as in \cite{lindorff2011} we used CHARMM22* force field \cite{Charmm22star}
-and the modified TIP3P water. The stepsize used was 5fs \GRE{or 2fs in case of protein A3D}, and the trajectories
-were strided to \GRE{ to reduce the data volume}. Differently
-from \cite{lindorff2011}, we used the Particle Mesh Ewald method for
-long-range electrostatics due to OpenMM \GRE{settings}. For each protein, the start \GRE{configuration
-is one frame in the reference dataset selected randomly from the 20\%
-of frames with the highest Root Mean Square Deviation (RMSD) from the
-protein crystal structure.} A short energy equilibration (1-2ns) was then
-performed in the NPT ensemble to create initial coordinates for the workflows.
-No further a priori information was given to the ExTASY framework except the
-unfolded start conformations.
+To compare the speed of exploration between adaptive sampling and plain MD, the fraction of explored population over time can be compared, as shown in Figure~\ref{fig:Pop_explored}. The time here is measure in absolute simulation time. The absolute simulation time is the length of consecutive molecular dynamics simulations, omitting any parallel similations. For example the absolute simulation time is the length of one single trajectory multiplied the number of iterations. This metric is directly related to the time to solution, which is in most cases the relevant criterium if an adaptive sampling can be performed. The absolute simulation length is hardware independent, which simplifies the comparison, in contrast to time to solution which heavily depends on hardware and software choices. Chapter 4 explored the effect of parallelization on the absolute simulation time, in this chapter the parallelization is held constant.
 
-In each iteration, 50 OpenMM trajectories were simulated on 50 \GRE{GPUs on Summit with one GPU per trajectory. The length of each trajectory was 50ns
-for Chignolin and Villin, 10ns for BBA and 40 ns for A3D. ExTASY scales up to
-1000s of GPUs, so it} can be used to simulate even larger proteins or \GRE{a larger number of parallel walkers}.  Steps 2 and 4 were performed on \GRE{one GPU on Summit utilizing the same job as the MD simulations.}  After all the simulations are finished, the folding times, speed up and the accuracy of protein dynamics was determined by
-comparing with the Anton MD simulations starting from the selected start
-conformation. 
-\GRE{In this paper, we illustrate the abilities of adaptive sampling and the ExTASY framework by comparing the results of adaptive sampling and plain MD for the 4 proteins. The expected variation of the time to fold for both adaptive sampling and plain molecular dynamics can reach 50\% \cite{Adstrategies2018}, caused by stochasticity. A significant increase of computational resources would be required to make the comparison between adaptive sampling and plain MD statistically significant.}
+The fraction of explored population is measured as a function of increasing absolute simulation time during an exploration, either for adaptive sampling or for plain MD. The populations and states for the the calculation of the explored population are defined by the reference datasets. The fraction of explored population is calculated by deteemining which states were explored and weighting with the stationary weight from the reference dataset.
 
+ExTASY can flexibly implement different adaptive sampling strategies. To illustrate the flexibility of ExTASY the proteins Chignolin and A3D were adaptively sampled with the $cmacro$ strategy and protein Villin and BBA were adaptively sampled with the $cmicro$ strategy. The strategies are described in Chapter 3. 
+
+Figure~\ref{fig:Pop_explored} shows that adaptive sampling both explores the landscape faster and also folds the 4 proteins faster than plain MD. The speed up of folding with adaptive sampling is 170\% for Chignolin, 20\% for Villin, 380\% for BBA, and above 690\% for A3D. For A3D this value couldn't be accurately determined due to limited computational resources to fold A3D with plain MD. A3D shows that even while the speed up with adaptive sampling increases for larger proteins, the computational resources necessary to fold the larger proteins increase too. The increased speed up with adaptive sampling for A3D follows the predictions discussed in Chapter 4.  
 
 \begin{figure}[H]
+\centering
    \begin{subfigure}[b]{0.6\linewidth}
    {\scalebarimg{figures2/plot_chigsummary14_pop_fraction2_2_mod3.pdf}{0.95}{A)}{0mm}{-5mm}}
    \end{subfigure}%
@@ -137,12 +140,11 @@ conformation.
    \end{subfigure}%
 
 
-  \caption{The population of explored states evolving with absolute simulation time.  Around one
-  order of magnitude shorter time to solution can be reached with adaptive
-  sampling compared to plain MD simulations. \GRE{For Chignolin and A3D the $cmacro$ adaptive sampling strategy was used, for Villin and BBA the $cmicro$ adaptive sampling strategy was used. Both adaptive sampling strategies are described in Section~\ref{sec:restart-strategies}. The vertical lines indicate folding events.} Individual proteins: A) Chignolin B) Villin }
+  \caption{The fraction of explored population increases with absolute simulation time. The absolute simulation is shown with an logarithmic scale. Folding events are pinpointed by the vertical lines. The speed up with adaptive sampling depends on the protein and generaly increases with the size of the protein. A) Chignolin B) Villin }
 \end{figure}
 
 \begin{figure}[H]\ContinuedFloat
+\centering
    \begin{subfigure}[b]{0.6\linewidth}
    {\scalebarimg{figures2/plot_bbasummary14_pop_fraction2_2_mod3.pdf}{0.95}{C)}{0mm}{-5mm}}
     \end{subfigure}%
@@ -150,63 +152,26 @@ conformation.
    \begin{subfigure}[b]{0.6\linewidth}
    {\scalebarimg{figures2/plot_a3dsummary15_pop_fraction2_2_mod3.pdf}{0.95}{D)}{0mm}{-5mm}}
     \end{subfigure}%
-  \caption{
-  \GRE{(cont.) Proteins C) BBA D) A3D } \GRE{The plain molecular dynamics simulation of A3D has not folded despite simulating about 7 times longer than necessary for folding with adaptive sampling. Additional computational resources would allow to fold protein A3D with plain molecular dynamics too.}}
+  \caption{(cont.)  C) BBA D) A3D For protein A3D the limited computational resources interrupted the folding with plain MD. The adaptive sampling of A3D was able to fold due to the speed up of adaptive sampling.}
   \label{fig:Pop_explored}
 \end{figure}
-\section{\label{sec:results}Results and Discussion}
 
-To analyze the efficiency of adaptive sampling, we considered several
-measures. To show the completeness of the exploration, we measured the fraction
-of the explored population and considered the overlap of the explored areas with the
-reference dataset. This also allows us to estimate the speed up time to solution
-compared to the reference method. To analyze the accuracy of the simulated
-protein dynamics we compare the relative entropy of the MSM transition
-matrices, and the Mean First Passage Time (MFPT) to the folded state, as
-detailed below.
 
-\subsection{\label{sec:time-fold}Comparison of Exploration}
+
+
+
+\subsection{\label{sec:kinetics}Comparison of Protein Dynamics}
+
+
+
+A popular and robust metric to measure the kinetic behavior of proteins in the Mean First Passage Time (MFPT). The MFPT measures the mean time a trajectory takes to reach state B for the first time while starting from state A. In this chapter MFPT from the folded states to the unfolded states is measured. This metric is a relatively robust measure of the conformational dynamics. A low error in the measured mfpt can confirm that the conformational dynamics are sampled accurately. The ensemble of folded and unfolded states are defined for each protein by the TICA coordinates of the states. 
+
+Figure~\ref{fig:mfpt} shows the evolution of mfpt with the absolute simulation time for individual proteins. At the beginning of the simulations, when the folded state is not explored yet, the mfpt can not be calculted. The MFPT for both plain MD and adaptive sampling converges towards the reference dataset value. The remaining errors of simulated MFPT compared to the reference MFPT are about one order of magnitude for both adaptive sampling and plain MD. When comparing the error of adaptive sampling MFPT with plain MD, the protein BBA shows as smaller adaptive sampling error, Villin shows similar error and Chignolin shows larger adaptive sampling error. The interpretation of the relative size of the MFPT errors is limited due to the small sample size and large stochasticity inherent to molecular dynamics. This allows us to conclude that adaptive sampling reaches similar errors of configurational dynamics in a much short time due to the speed up. Novel adaptive sampling strategies could reach higher accuracies than plain MD. 
+
+
+These magnitude of MFPT errors matches the results obtained with the HTMD framework \cite{doerr2016htmd} for the protein Villin. With ExTASY the conformational dynamics of larger proteins such as BBA was investigated. The results for A3D are limited due to the limited computational resources preventing the folding of A3D with plain MD.  
 \begin{figure}[H]
-   
-   \begin{subfigure}[b]{0.7\linewidth}
-   {\scalebarimg{figures2/plot_vilsummary14_rel_ent_fold_4_mod2.pdf}{1}{}{0mm}{-3mm}}
-   \end{subfigure}%
-   
-  \caption{
-  Relative entropy between the MSM transition matrices generated during the
-  ExTASY exploration and from the \GRE{plain MD comparison run}. Results \GRE{for protein Villin}. The relative entropy decreases with increasing number of adaptive
-  sampling iterations. }
-  \label{fig:rel_ent}
-\end{figure}
-
-The whole explored energy landscape of the protein cannot be visualized due to
-the high dimensionality of the raw trajectories, but the explored landscape in
-the reduced TICA coordinates is shown in
-Figure~\ref{fig:overlap}. The colored background shows the explored free energy landscape of
-the reference dataset and the shaded foreground shows the region of this landscape explored
-by the adaptive sampling. The whole energy landscapes of the proteins\GRE{ Chignolin, Villin, BBA and A3D were} explored by ExTASY. The small differences in overlap could be
-caused by the differences in the long-range electrostatics setup and stochastic \GRE{nature of the exploration}. The case of protein A3D shows that for larger protein the computational resources to fully explore the energy landscape rise significantly. \GRE{Our computational resources allowed us to fold A3D with adaptive sampling, but not with plain molecular dynamics. The plain molecular dynamics simulation didn't fold even when simulating about 7 times longer than the time to fold with adaptive sampling. To show that adaptive sampling works with different adaptive sampling strategies, we folded Chignolin and A3D with the $cmacro$ adaptive sampling strategy and  the $cmicro$ adaptive sampling strategy was used to fold Villin and BBA.}
-
-To show how effectively the whole protein landscape is explored, we
-use the fraction of the total population explored as a function of time.
-Here we select all the states which are explored at a certain time and
-compare with all possible states (as obtained from the reference simulations).
-To represent the different importance of different states we weight the
-explored states with their stationary weight. The population of each microstate
-is calculated as the stationary weight of that microstate from the MSM analysis of
-the reference dataset. Figure~\ref{fig:Pop_explored} reports the comparison of
-the explored populations as a function of time for the reference dataset and
-the ExTASY results. \GRE{For all 4 proteins, adaptive sampling explores the protein energy landscape slightly faster and folds significantly faster. The folding speed up of adaptive sampling compared to plain MD is 170\% for Chignolin, 20\% for Villin, 380\% for BBA, and more than 690\% for A3D. The larger speed up for A3D is in line with the prediction that for larger and more complex protein adaptive sampling achieves a larger speed up\cite{Adstrategies2018}. The exact speed up for the protein A3D could not be determined due to limited computational resources. The quantitative comparison between adaptive sampling and plain MD is not statistically significant due to the low sample size caused by limited computational resources.}
-
-The x-axis in Figures~\ref{fig:Pop_explored}-\ref{fig:mfpt}
-is absolute simulation time to show the improvement of time to solution with ExTASY.
-Absolute simulation time is the length of one trajectory in Step 1 times the number of iterations.
-When all the trajectories in Step 1 are run in parallel, the absolute simulation time
-shows the time to solution independent of the used hardware. The effects of parallelization
-on the time to solution for adaptive sampling were explored in \cite{Adstrategies2018},
-generally \GRE{parallelization} decreases the time to solution.
-
-\begin{figure}[H]
+\centering
    \begin{subfigure}[b]{0.5\linewidth}
    {\scalebarimg{figures2/plot_chigsummary14_mfpt_unfold_3_mod2.pdf}{1}{A)}{0mm}{-2mm}}
    \end{subfigure}%
@@ -219,53 +184,45 @@ generally \GRE{parallelization} decreases the time to solution.
    {\scalebarimg{figures2/plot_bbasummary14_mfpt_unfold_3_mod2.pdf}{1}{C)}{0mm}{-2mm}}
     \end{subfigure}%
   \caption{
-  MFPT from \GRE{folded to unfolded states evolving as
-  more data is available after more adaptive sampling iterations. The red line is adaptive sampling, the blue line is plain MD with the same parallelization as adaptive sampling. The black dashed line shows the reference values for Anton simulation trajectories\cite{lindorff2011}.}   
-  Individual proteins: A) Chignolin B) Villin C) BBA } 
+  The evolution of the unfolding Mean First Passage Times is shown over the simulation time. Adaptive sampling is red and plain MD is blue. The reference values are shown in black.
+  A) Chignolin B) Villin C) BBA } 
   \label{fig:mfpt}
 \end{figure}
 
-\subsection{\label{sec:kinetics}Comparison of Protein Dynamics}
 
+Another metric to inspect the accuracy of the configurational dynamics is relative entropy \cite{bowman2010enhanced}. This modified entropy compares the ransition matrices between reference and the sampled data. One motivation of using relative entropy that this measure includes all transitions, as opposed to MFPT which focuses on certain configurational motions. 
+The relative entropy compares the MSM transition matrices of the reference data $P_{ij}$ and of the analyzed data $Q_{ij}$. The two transition matrices are required to use exactly the same dimension reduction and clustering for generation. The relative entropy $D(P||Q)$ is defined as following where $s_{i}$ is the equilibrium probability of state $i$. This equation is analogous to the Kullback–Leibler divergence equation.
 
-To track the convergence of protein dynamics in the adaptive sampling workflow,
-one can use the relative entropy \cite{bowman2010enhanced} between the
-MSM transition matrix of the reference data, $P_{ij}$, and the MSM transition matrix
-of the analyzed data, $Q_{ij}$.
-A relative entropy can be calculated between each microstate in the analyzed
-and the reference transition probabilities from this state. By averaging the
-relative entropy for each state weighted by the stationary probability over all
-microstates we obtain the relative entropy between the two transition matrices.
-The relative entropy
-$D(P||Q)$ is then given by
 \begin{equation}
 D(P||Q)=\sum_{i,j}^{N}s_{i}P_{ij}\ln\frac{P_{ij}}{Q_{ij}}. 
 \end{equation}
-where $s_{i}$ is the equilibrium probability of state $i$. The transition
-matrices $P_{ij}$ and $Q_{ij}$ have to use exactly the same dimension reduction
-and same clustering.
-As zero counts in the transition matrices can cause divergence of the relative
-entropy, a pseudo-count of $1/N$ (where $N$ is the length of the simulation) is
-added to each element of the count matrices
-before normalizing the rows to get the transition matrices
-\cite{bowman2010enhanced}. \GRE{ The relative entropy for a certain simulation time is
-obtained from all the trajectories up to the specified simulation time. By definition, the relative entropy of the full reference
-trajectory is zero.  Figure~\ref{fig:rel_ent} shows how the relative
-entropy decreases with increasing simulation time for both the adaptive sampling and plain MD simulations. The adaptive sampling strategy decreases the relative entropy faster at the beginning, later in the simulation plain MD decreases the relative entropy faster. While the sample size is small, this confirms that the chosen investigated sampling strategy is effective at exploring the protein landscape, but not optimized in the later steps of converging protein kinetics \cite{Adstrategies2018}. Different adaptive sampling strategies which are optimized for converging the kinetics could improve the behavior of adaptive sampling towards the end of the simulation.}
 
-\GRE{An additional measure to compare the convergence of the kinetic behavior of the proteins is Mean First Passage Time (MFPT). MFPT measures the mean time to reach for the first time another state from one state. Here the two states are the folded and unfolded states, both defined as an ensemble of MSM states based on the TICA coordinates. The folded and unfolded MSM states for the proteins were
-defined by their TICA positions. Figure~\ref{fig:mfpt} shows how the MFPT from the
-folded to the unfolded state converges as a function of simulation time, for both the adaptive sampling and the plain MD simulations. The reference MFPT obtained from Anton trajectories shows that the results of both plain MD and adaptive sampling can be about one order magnitude off the reference value. Adaptive sampling shows larger errors in the case of Chignolin and Villin, but a smaller error in the case of BBA compared to plain MD. The small sample size prevents us to conclude if plain MD or adaptive sampling converges faster. Additionally, the used adaptive sampling strategies are not optimized or validated for convergence of kinetics. The slow convergence of MFPT for Chignolin and Villin shows that accurate kinetic values require a long sampling and that kinetic values from both plain MD and adaptive sampling have relatively large uncertainties. The sizes of the MFPT errors are similar to what was obtained with the HTMD framework \cite{doerr2016htmd}. For protein A3D the convergence of MFPT could not be compared since the plain MD simulation did not fold. Additional investigation in the theory of convergence of kinetic values for protein sampling methods would allow understanding these results better.}  
+To make the relative entropy metric more robust to the stochasticity of the sampling, a correction of the transition matrices is added. A pseudo-count of $1/N$ is added to each element of the count matrices, with $N$ the number of states. The transition matrices are obtained by before normalizing the rows of the count matrices. This pseudo-counts represents a uniform prior and reduces the effect of zero values in $Q_{ij}$.
+
+Figure ~\ref{fig:rel_ent} shows how evolution of the relative entropy with absolute simulation time. Increasing sampling for both plain MD and adaptive sampling decreases the relative entropy in direction of zero. It;s observed that adaptive sampling for Villin reduces faster the relative entropy at the beginning than plain MD. In later stages of simulation, the plain MD reduces the relative entropy faster. The explanation for the later slower reduction of relative entropy is that the adaptive sampling strategies prioritize the sampling of slow collective motions. In contrast the fast transitions are sampled less. The relative entropy depends mostly on the fast transitions due to the larger number of fast transitions. Relative entropy should be used only for use cases where the sampling accuracy of many fast transitions is the objective.
+
+\begin{figure}[H]
+   \centering
+   \begin{subfigure}[b]{0.7\linewidth}
+   {\scalebarimg{figures2/plot_vilsummary14_rel_ent_fold_4_mod2.pdf}{1}{}{0mm}{-3mm}}
+   \end{subfigure}%
+   
+  \caption{
+  The evolution of the relative entropy between the MSM transition matrices from adaptive sampling and plain MD is shown.  For protein Villin the relative entropy decreases with increasing simulation time.}
+  \label{fig:rel_ent}
+\end{figure}
 
 
 \section{\label{sec:conclusion}Conclusion}
 
-We have shown that the ExTASY framework \cite{Extasy2016} can effectively
-perform adaptive sampling, as exemplified \GRE{by adaptively sampling 4 proteins using deep learning. The free energy landscape of the 4 proteins was fully sampled. In comparison to a plain molecular dynamics simulation with the same parallelization a small but not statistically significant speed up in the range of 20\% to 690\% could be observed. These speed ups are in line with predictions \cite{Adstrategies2018} which rise with the size of the proteins. The MFPT times converged for both adaptive sampling and plain MD to values similar to the reference values. For protein BBA the adaptive sampling converges the MFPT significantly faster than plain MD, but proteins Chignolin and Villin show as slower convergence. The expected large stochastic fluctuation expected in both plain MD and adaptive sampling prevents a statistically significant comparison of MFPT times between plain MD and adaptive sampling. The sample size in this paper was limited by computational resources. Additional adaptive sampling strategies optimized in recovering the kinetics would improve the results of adaptive sampling for MFPT convergence. The relative entropy between the transition matrix of the MSM computed during the adaptive
-sampling and the MSM of the plain MD decreases steadily with the
-simulation time, the adaptive sampling converges here faster than plain MD at the beginning of the simulation. The differences in speed of convergence are caused by the choice of adaptive sampling strategy, which are validated for the exploration of protein energy landscapes, but not optimized to reach accurate protein kinetics. Due to the stochasticity, the comparison of the speed up between adaptive sampling and plain MD is not statistically significant. For statistically significant results a significant increase in computational resources would be required.}
-\GRE{The modularity of the ExTASY framework reduces the time spent by domain experts in executing
-adaptive sampling in a scalable fashion on diverse platforms. Scalability of over 1000 GPUs and 1000 simultaneous protein replicas was demonstrated on Summit. This scalability doesn't come at the cost of inflexibility, due to the design and implementation of the ExTASY framework \cite{Extasy2016}, ExTASY can be
-easily modified for different proteins or MD
-simulation software. ExTASY can also be easily extended to different adaptive
-sampling strategies and platforms. The ExTASY framework is available open-source at} \href{https://github.com/ClementiGroup/ExTASY}{https://github.com/ClementiGroup/ExTASY}. \GRE{The flexibility of ExTASY allowed this framework to be the first open-source adaptive sampling platform which supports deep learning or asynchronous execution.}
+The results in this Chapter show the ExTASY framework \cite{Extasy2019} effectively
+performed adaptive sampling, confirming that adaptive sampling performs as predicted for the investigated 4 proteins. 
+For all proteins the free energy landscape was fully sampled, up to the expected stochasticity on rarely sampled areas. The speed up of folding with adaptive sampling reached values between 20\% to 690\%, where the largest increase was observed for the largest protein. This observation falls in line the prediction that larger, and more complex protein reach larger speed ups with adaptive sampling. the values of speed up fall also in the expected range. Due to the large stochasticity and low sample size caused by limited computational resources, these exact values of speed up have limited statistical significance. 
+
+One of the claimed advantages of adaptive sampling compared to other sampling techniques is the accurate estimation of kinetic values. The observed Mean First Passage Times confirm that adaptive sampling reaches similar accuracy of kinetic values after a short absolute simulation length. The absolute simulation length is directly related to the time to solution. The observed errors of kinetic values for both adaptive sampling and plain MD are up to a order of magnitude and further approaches to reduce the size of the errors are necessary. Novel adaptive sampling strategies optimized specifically for accuracy of slow conformational dynamics would improve the results of adaptive sampling compared to plain MD. The comparison of relative entropy can conclude that relative entropy has only limited informative value for the accuracy of the slowest motions of the biomolecules.  
+ 
+
+Due to the results matching with the results in Chapter 4, we can conclude that the approach of approximating molecular dynamics trajectories with Markov Chain trajectories doesn't introduce significant errors. The resulting predictions in adaptive sampling performance were confirmed with molecular dynamics trajectories. The large stochastic component in the performance of adaptive sampling was observed as well.
+
+
+The limited computational resources only allowed to confirm the performance for proteins up to 73 residues. Larger protein with longer folding times would require longer MD simulations, but the speed up is expected to increase. For larger protein even larger number of replicas than 50 would be effective, as shown in Chapter 4. The scaling of adaptive sampling performance to larger number of replicas was predicted to increase for larger proteins. No software scaling limitating are expected for larger proteins, since the software package ExTASY scales up to 1000s of GPUs which represents up to 1000 replicas.

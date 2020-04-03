@@ -17,7 +17,7 @@ pdflatex $file'.tex'
 
 echo 'ok'
 rm .pdf  q.pdf
-rm *aux *lot *idx *lof *bbl *blg *toc
+rm *aux *lot *idx *lof *bbl *blg *toc *out
 rm $file'.log' #$file'.aux' 
 echo 'ok'
  "/c/Program Files (x86)/Adobe/Acrobat Reader DC/Reader/AcroRd32.exe" $file.pdf
