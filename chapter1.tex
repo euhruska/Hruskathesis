@@ -23,7 +23,7 @@ In the next chapter 4, the current strategies will be compared in a statisticall
 
 Chapter 5 will introduce the computational tools and software frameworks necessary to successfully and efficiently execute adaptive sampling. Due to the many subtasks, adaptive sampling contains, these practical considerations have a direct impact on the viability of adaptive sampling for solving sampling problems.
 
-This developed software framework will be used in Chapter 6 to show the results and the accuracy which adaptive sampling can achieve for different biomolecular systems,. 
+This developed software framework will be used in Chapter 6 to show the results and the accuracy which adaptive sampling can achieve for different biomolecular systems. 
 
 A final chapter will summarize the current achievements and discuss further open questions and possible directions.
 
@@ -121,9 +121,9 @@ The non-linear approach of SRVs allows reaching the same accuracy as TICA for sh
 
 \section{Markov state models}
 
-The dimension reduced trajectories from TICA or SRVs are ideal for the generation of Markov state models (MSM)\cite{Noe2015}. MSM can describe the non-linear multi-state behavior of proteins. The states  are commonly defined by clustering of the dimension reduced trajectory frames with k-means clustering. The clustering allows converting the dimension reduced trajectory into discrete (state) trajectories. The transitions of the discrete trajectories between states lead to the count matrix $C_{ij}$. The count matrix $C_{ij}$ indicates the number of transitions from state $i$ to state $j$ after a time lag $\tau$. The count matrix is row-normalized to obtain the transition matrix of the MSM $T_{ij}$.
+The dimension reduced trajectories from TICA or SRVs are ideal for the generation of Markov state models (MSM)\cite{Noe2015}. MSM can describe the non-linear multi-state behavior of proteins. The states are commonly defined by clustering of the dimension reduced trajectory frames with k-means clustering. The clustering allows converting the dimension reduced trajectory into discrete (state) trajectories. The transitions of the discrete trajectories between states lead to the count matrix $C_{ij}$. The count matrix $C_{ij}$ indicates the number of transitions from state $i$ to state $j$ after a time lag $\tau$. The count matrix is row-normalized to obtain the transition matrix of the MSM $T_{ij}$.
 
-The MSM behavior can be described by the eigendecomposition of the transition matrix. $\varLambda$ is the diagonal matrix is eigenvalues, and $\mathbf{U}$ is the eigenvector matrix.
+The MSM behavior can be described by the eigendecomposition of the transition matrix. $\varLambda$ is the diagonal matrix of eigenvalues, and $\mathbf{U}$ is the eigenvector matrix. The slowest eigenvector represents the stationary distribution of state probabilities.
 
 $$\mathbf{U}T=\mathbf{U}\varLambda$$
 
