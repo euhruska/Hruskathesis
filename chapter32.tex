@@ -3,33 +3,14 @@
 \afterpage{\null\newpage}
 \chapter{Adaptive Sampling Comparison\label{ch:chapter32}}
 
-One major challenge in developing, investigating and comparing adaptive sampling strategies is the large computational resources required to run adaptive sampling with the necessary molecular dynamics trajectories. To reach statistically significant sample sizes requires even larger computational resources rarely available.
-The alternative of investigating adaptive sampling for toy systems or small peptides requires lower amount of computational resources. The lower dimensionality of these smaller test systems reduces the transferability of the resulting conclusions to biomoleculer which have order of magnitude more degrees of freedom and a more complex energy landscape. Some strategies which work well for toy systems of small peptides have significant challenges to scale up to larger proteins. One answer to this challenge in accurately investigating adaptive sampling strategies is the utilization of Markov Chain trajectories. These approximations of molecular dynamics trajectories can be generated many orders of magnitudes faster than molecular dynamics trajectories when the Markov State Model of a protein is known. Toy systems have 
-
-The material in this chapter was first published in: 
+One major challenge in developing, investigating and comparing adaptive sampling strategies are the large computational resources required to run adaptive sampling with the necessary molecular dynamics trajectories. To reach statistically significant sample sizes requires even larger computational resources which are rarely available.
+The investigation of adaptive sampling for toy systems or small peptides requires lower amount of computational resources. The lower dimensionality of these smaller test systems reduces the transferability of the resulting conclusions to biomolecules which have an order of magnitude more degrees of freedom and a more complex energy landscape. Some strategies which work well for toy systems of small peptides face significant challenges to scale up to larger proteins. 
+An alternative approach to investigating adaptive sampling strategies for larger biomolecules is the utilization of Markov Chain trajectories. These approximations of molecular dynamics trajectories can be generated many orders of magnitudes faster than molecular dynamics trajectories, allowing a better sample size than generating molecular dynamics trajectories for adaptive sampling. The requirement for the generation of Markov Chain trajectories is the knowledge of the Markov State Model of a protein.  In this chapter adaptive sampling strategies are investigated with Markov Chain trajectories, the material in this chapter was first published in: 
 
 \cite{Adstrategies2018} \textbf{Hruska, E.}; Abella, J. R.; N\"uske, F.;
 Kavraki, L. E. \& Clementi, C.; Quantitative
 comparison of adaptive sampling methods
 for protein dynamics. J. Chem. Phys. 149 (2018) 
-
-
-X
-In order to be able to benchmark and compare the results on different systems, we
-use previously generated extensive MD trajectories \cite{lindorff2011} to
-generate 8 discrete models for protein dynamics.
-The results of this analysis reveal that different strategies are needed
-for different goals. In particular, on-the-fly estimation of global
-equilibrium properties from non-equilibrium data is very important to speedup
-the folding of a protein, while the knowledge of equilibrium properties is not
-needed if the goal is the exploration of large regions of the conformational
-space (independently if folded or unfolded). This result suggests that
-different strategies may need to
-be combined in various stages of a specific application to both enhance the
-occurrence of a rare event and appropriately sample the different metastable states.
-Comparison of the results on different proteins
-suggest that the speedup that can be achieved by adaptive sampling is larger
-for slower processes, thus encouraging the application to more complex systems.
 
 
 
@@ -38,19 +19,13 @@ for slower processes, thus encouraging the application to more complex systems.
 
 \subsection{\label{sec:methods-dataset}Reference Dataset of Simulations}
 
-We used previously existing long all-atom MD trajectories
-of 8 different small proteins\cite{lindorff2011}, obtained on the Anton supercomputer, to generate
-discrete model systems, as discussed below. The dataset is summarized in Table
-\ref{tab:dataset-summary} and contains proteins ranging from 10 to 80 residues,
-with different topologies ($\alpha$-helices, $\beta$ sheets, or a mix of both),
-simulated folding times ranging from $0.6$ to $49$ $\mu$s, and different timescale gaps between
-the folding process and other competing slow processes.
+To generate accurate Markov State Models which well sampled simulations are necessary. Here we used published long all-atom molecular dynamics trajectories from Anton supercomputer\cite{lindorff2011}.
+The Table\ref{tab:dataset-summary} shows the 8 proteins utilized. The 8 proteins are ranging  from 10 to 80 residues. These proteins have with different topologies, both $\alpha$-helices, $\beta$ sheets and a  mix of both. The folding times in simulation are ranging from $0.6$ to $49$ $\mu$s. These protein are relaltively fast folding since only fast folding proteins can be currently simulation with multiple folding and unfolding events.
 
 \begin{table}[!ht]
 \centering
-\caption{Previously simulated proteins used to generate discrete models in this study}
+\caption{Proteins for reference data}
 \label{tab:dataset-summary}
-%\begin{tabular}{ccccc}
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -69,187 +44,73 @@ $\lambda$-repressor  & 1LMB               & 80                 & 49             
 }
 \end{table}
 
-\subsection{\label{sec:methods-msm}Construction of discrete protein models}
+\subsection{\label{sec:methods-msm}Construction of Markov State Models}
 
-To emulated adaptive sampling, an MSM was generated for each protein from
-the previously existing long all-atom MD trajectories, then synthetic
-microstate trajectories are generated by sampling the MSM transition matrix.
-An MSM models the system's dynamics by discretizing the explored
-conformational space into a finite number of states, and estimating their
-probability and the probability of transition between them \cite{prinz2011markov}.
-The analysis is summarized by a transition matrix,
-$T_{ij}$, that indicates the probability that the system transitions from state
-$i$ to state $j$ within a chosen lag time $\tau$. The discretization of the
-original conformational space into states (also called microstates) is usually
-performed by clustering the configurations sampled by MD trajectories using
-a distance metric that can separate slowly mixing configurations from rapidly
-interconverting ones \cite{noe2016commute, Noe2015}.
+Markov Chain trajectories can approximate molecular dynamics trajectories only when the Markov State Models are accurate. The MSM respresents the biomolecules stationary and dynamic behavior. 
+We have used the standard procedures to generate MSM. The trajectories were dimension-reduced with Time-lagged Independent Component Analysis (TICA) 
+\cite{TICA1-perez2013, TICA2-schwantes2013}, where the output dimension are scaled according to commute map 
+\cite{noe2016commute}. The input features for TICA were all pairwise
+inter-residue distances and all dihedral angles of the protein.  The pairwise
+inter-residue distance is the closest heavy-atom distance between a pair of residues. 
+For the smaller proteins,  additional features of inverse inter-residue distances were used to increase the accuracy. This dimensional reduced space was clustered with k-means clustering into 1000 or 2000 states, depending on the size and sampling of the protein. This larger number of microstates is selected to increase accuracy of the Markov Chain trajectories and is only possible due to the good sampling of the reference trajectories. The disconnected microstates were removed and the folding-unfolding process was set as the slowest MSM eigenvector. 
 
-We have used standard procedures to perform these steps. In particular, for
-each protein, we used the Time-lagged Independent Component Analysis (TICA) 
-\cite{TICA1-perez2013, TICA2-schwantes2013} combined with the commute map 
-\cite{noe2016commute}, to reduce the dimensionality of the system. As an input
-for TICA, each conformation was first featurized using all pairwise
-inter-residue distances (between the two closest heavy-atoms) and all dihedral
-angles along the protein chain.
-For smaller systems, the reciprocals of the inter-residue distances were also
-used as additional features. The Euclidean distance between the
-lower-dimensional points in the commute map space provides a good measure to
-obtain a kinetically meaningful state decomposition, and an associated MSM
-\cite{noe2016commute}. All conformations were then
-partitioned with k-means clustering into 1000 or 2000 microstates, depending on
-the size of the protein. It was ensured that the slowest MSM eigenvector is the
-folding-unfolding process and all microstates are connected by removing
-disconnected microstates. Finally, the transition matrix for the MSM is
-computed using maximum-likelihood estimation with a detailed balance
-constraint. The lag time, $\tau$, for the MSM was chosen based on the
-convergence of the implied timescales, and the Markovianity property of the MSM
-was tested by using the Chapman-Kolmogorov test \cite{prinz2011markov}. All the
-analysis was performed using the PyEMMA Python package \cite{scherer2015pyemma}
-and the exact parameters for the construction of discrete protein models for
-each protein are listed in the Supplementary material.
+For each protein, a set of folded and unfolded states are defined. The native contacts are extracted from the folded structures shown in Table \ref{tab:dataset-summary}. For each state, the median number of native
+contacts is determined. States with median number of native contacts above a folding threshold are assigned as the folded states. States with native contacts above a unfolding threshold are set as the unfolded states.
 
-X create markov Chain trajectories
+The clustering results in microstate trajectories. The reference MSMs are generated by maximum-likelihood estimation under detailed balance
+constraint. The lag time $\tau$ for MSM generation was selected based on the plateau of implied timescales. The Markov property of the resulting MSM was tested by Chapman-Kolmogorov validation. All this
+analysis was executed with the PyEMMA package \cite{scherer2015pyemma}. Details of the MSM generation are described in the paper\cite{Adstrategies2018}.To generate Markov Chain trajectories, synthetic microstate trajectories are generated according to the transition probabilities of the MSM transition matrix.
+
+ 
 
 \subsection{\label{sec:level5}Simulating adaptive sampling with Markov Chain trajectories}
-X recerence chapter 3 Figure~\ref{fig:schema2}  
-Adaptive sampling involves iteratively running many short MD trajectories, and
-different adaptive sampling methods differ in how the new structures are chosen
-to initialize the next round of MD trajectories. We can simulate the adaptive
-sampling process of iteratively running an ensemble of $n$ MD trajectories 
-using the transition matrix from an MSM as follows. 
-Note that the restart strategies here are concerned with selecting states
-visited among the discrete set of microstates in the MSM. 
-In actual molecular dynamics simulations, continuous trajectories in a protein
-configurational space are used instead of the synthetic trajectories generated here
-by jumping between the different discrete states of an MSM in adaptive step 2.
-Therefore, in actual simulations the analysis (adaptive step 3 below) involves also the
-the discretization of all the available trajectories into a set of microstates.
 
+The simulation of adaptive sampling with Markov Chain trajectories follows the schematic in Chapter 3 Figure~\ref{fig:schema2}. 
+Instead of simulating an ensemble of $n$ MD trajectories and ensemble of $n$ Markov Chain trajectories is simulated. The required time for simulating Markov Chain trajectories is order of magnitudes smaller than simulating equivalent MD trajectories. This allows to simulate many repetitions of adaptive sampling and for multiple proteins.
 
-We denote the adaptive steps 3 and 4 together as the \emph{restart strategy} for an
-adaptive sampling method. Figure~\ref{fig:schema} is a graphical representation
-of the process. The different restart strategies that we use in this work are
-described in detail in the following section. When using continuous trajectories from actual molecular dynamics simulations,
-the analysis step 3 also includes the discretization of the continuous
-trajectories into discrete trajectories (for instance, by means of TICA and MSM).
-Thus, the restart strategy for adaptive sampling in actual molecular dynamics
-simulations must also select a set of individual conformations or frames from the selected
-microstates to initialize the next MD simulation. This can be done for example in
-a uniformly random fashion within the microstate or by selecting a representative
-conformation. 
-The length of the trajectories in each iteration can be varied, but it needs to
-be larger than the lag time used to generate the MSM.
-Here we chose the length of each short MD trajectory the same as the lag time
-$\tau$, that is, the analysis is performed after the discrete trajectories have
-been propagated by one step of length $\tau$. 
-At each iteration, for a given strategy, the $n$ restarting points for the new
-trajectories are chosen independently of each other.
+The investigated sampling strategies are plain MD as reference, and $cmicro$, the 4 $cmacro$ strategy variants, the two adaptive sampling strategies with \emph{a priori} information $Q_{f}$ and $Q_{f,nn}$ and the two optimal strategies for adaptive sampling performance $p_{esc}$ and $t_{opt}$.  These strategies were described in Chapter 3.
+At the end of each iteration of each strategy a new set of $n$ restarting points are chosen. The restarting points were chosen based on the adaptively sampled MSM. This iteratively updating adaptively sampled MSM represents only the explored transitions captured in the sampled Markov Chain trajectories. 
 
-In order to study the speedup in folding, subsets of the discrete microstates for
-each protein are denoted as folded and unfolded states. 
-Using the PDB files from Table \ref{tab:dataset-summary}, the native contacts
-are extracted for the folded structure of each protein. A native contact is
-defined if the distance between the two closest heavy atoms in a pair of
-residues is 4\r{A} or less. For each state in the MSM, we compute the median number of native
-contacts over all the conformations mapped to the state. States above a threshold
-value for the number of native contacts are assigned as a folded state. States
-below a threshold value for the number of native contacts are assigned as an
-unfolded state. The threshold values for individual proteins can be found in the Supplementary material. 
-
-
+Two of the $cmacro$ strategy variants include the Koopman method to improve the accuracy of the Markov State model. The Koopman method applies directly to the molecular dynamics trajectory which is not available here. To estimated the effect of the Koopman methods on adaptive sampling, the adaptively sampled MSM is corrected to the transition probabilities from the reference MSMs. This approach gives an upper limit on the improvement of adaptive sampling the Koopman method can achieve. 
 
 
 \section{\label{sec:results}Results}
 
-In order to quantify the performance of different adaptive sampling strategies,
-we considered two broad measures of efficiency. The first measure is the time
-it takes for a strategy to simulate a rare event, in terms of steps of synthetic
-trajectories. For the dataset used here, the rare event of interest is the
-folding process and, for all proteins considered, the slowest timescale (or
-rarest event) is the folding timescale. For each strategy, the average time measured
-for a given strategy to reach the folded state starting from an unfolded state
-is compared with the corresponding time in the absence of adaptive sampling
-(that is, for the MD strategy described above). The second measure is one
-that focuses on the exploration of the configurational space instead of a single
-rare event. For any given strategy, we measure the time needed to explore 95\%
-of the states used to build the MSM and compare it with the corresponding MD time.
-For each protein, we evaluate these two measures for each of the adaptive
-sampling strategies described above. Each strategy is evaluated by using a different
-number of parallel trajectories $n$, ranging from 1 to 5000. 
-The results reported
-are averaged over 100 independent runs per protein and per number of parallel
-trajectories.
+Once the adaptive sampling is generated for each protein, each sampling strategy and repeated 100 times, the sampling can be evaluated according to different sampling objectives.
+Here we quantify the adaptive sampling performance by two sampling objectives. The first objective is the time to cross the rare transition barrier or folding of the protein. The second objective is the time to explore 95\% of the states, representing the exploration of the whole energy landscape.
+In each case the average and the 20\% and 80\% percentiles are measured and compared with the other sampling strategies, including plain MD.  
+In each case a parallelization $n$ of 100 replicas is chosen, except for the scaling comparison where the parallelization $n$ ranges from 1 to 5000. 
 
 \subsection{\label{sec:time-fold}Time to fold}
 
 \begin{figure}[H]
   %%\centering
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/CLN025_7_steps10000_nparallel100_fold.eps}
-    %%\caption{Chignolin}    
+    \includegraphics[width=0.9\textwidth]{figures/CLN025_7_steps10000_nparallel100_fold.eps} 
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/GTT_7_steps10000_nparallel100_fold.eps}
-    %%\caption{WW Domain}    
+    \includegraphics[width=0.9\textwidth]{figures/GTT_7_steps10000_nparallel100_fold.eps}  
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/A3D_7_steps10000_nparallel100_fold.eps}
-    %%\caption{$\lambda$-repressor}    
+    \includegraphics[width=0.9\textwidth]{figures/A3D_7_steps10000_nparallel100_fold.eps}   
   \end{subfigure}
-  \caption{Comparison of the number of steps of synthetic trajectories required
-  to fold for the different adaptive sampling strategies for three different
-  proteins using 100 parallel trajectories. The 20\% and 80\% percentiles are
-  shown as the error bars. The results of the t-test between MD and the
-  individual strategies for the different proteins are reported in the Supplementary material.}
+  \caption{Time to fold for the different sampling strategies for proteins Chignolin, WW Domain and $\alpha$3D.}
   \label{fig:Time_fold}
 \end{figure}
 
-Figure~\ref{fig:Time_fold} shows the average folding time for each of the
-strategies for three different proteins using 100 parallel trajectories. First, we note that the
-popular microstate-based $1/C$ strategy does not always appear to speedup the
-folding time, while the macrostate-based methods do show significant
-improvement over MD. 
-Interestingly, the benchmark strategy designed to maximize the probability to
-visit unexplored regions of the configurational space  ($p_{esc}$, defined
-above) does not significantly speedup the sampling of the folding rare event.
-Both $1/C$ and $p_{esc}$ are strategies designed for general exploration and
-not specifically for rare event sampling, and it is not surprising that these
-strategies do not perform well in accelerating folding events.
-Instead, the macrostate-based methods appear to successfully introduce a
-sampling bias toward states that are along the direction of the slowest
-timescale, as manifested in the significant speedup with respect to simple MD.
-These results are consistent over the set of model proteins studied.
 
-Within the macrostate-based methods, the correction for non-equilibrium that
-can be achieved by Koopman reweighting ($1/C_M^K$) appears to further improve
-the sampling of the rare folding event over using a simple uncorrected count
-matrix ($1/C_M^C$) in the on-the-fly MSM definition. The correction for
-non-equilibrium allows a more accurate estimation of the leading eigenvector of
-the true transition matrix over using the raw, on-the-fly count matrix. Thus,
-the resulting macrostates are more kinetically relevant. We also observe that
-the results obtained when the number of macrostates is defined by the kinetic
-content ($1/C_{M, 2}$) do not differ significantly from what is obtained when a constant number
-of macrostates is used ($1/C_{M, 1}$). In some instances, it appears that using
-kinetic content slightly hurts the performance of the adaptive sampling, which
-may be due to inaccurate estimation of the timescales in the early stages
-of the simulation.
+The time to folding of the protein is the most common objective of adaptive sampling. Figure~\ref{fig:Time_fold} shows the performance of different adaptive sampling strategie with Markov Chain trajectories.
+Each sampling strategy should be compared with plain MD which is the reference sampling strategy.
+The simple $cmicro$/$1/C$ strategy shows no speed up for Chignolin, WW Domain and only a small 2x speed up for $\alpha$3D. This shows that the $cmicro$ strategy is not optimal for folding proteins. The reason for the low efficiency lies in the oversampling of states which are not on the folding path, but have a low stationary probability and high restart probability.
 
-Finally, we observe that incorporating a reaction coordinate, such as the
-number of native contacts in the strategies does indeed significantly improve
-the sampling of rare events. The improvement is, in fact, close to the
-theoretical maximum that is estimated by $t_{opt}$. We also observe that the
-addition of the number of non-native contacts as a second reaction coordinate
-does not always improve the performance of the algorithm. In particular, this
-is true for the smallest of the protein model considered (Chignolin), the
-kinetics of which does not exhibit any additional slow processes besides
-folding (see Fig.~\ref{fig:Time_fold}). For all the other protein models, the
-introduction of a second reaction coordinate very marginally improves the
-sampling of the folding process.
-These patterns are consistent across all the proteins and across the number of
-parallel trajectories used. The plots for all proteins (in addition to
-Fig.~\ref{fig:Time_fold}) can be found in the Supplementary material.
+The $cmacro$ strategies show a significant speed up compared to plain MD for all the proteins, but the 4 variants of the $cmacro$ strategies show significant performance differences.
+Between the 4 variants of the $cmacro$ strategies it seems the the correction of the MSM due to non-equilibrium  $1/C_{K, 1}$ improves the results most. While the approximation of the Koopman method with the Markov Chain trajectories is only a upper limit for the performance improvement, the improvement is 2-3x. The improved performance of the corrected MSMs is caused by the improved estimation of the collective motions of the proteins. The estimated macrostates are kinetically more accurate. The 2 variants in setting the number of macrostates doesn't show a large performance effect. The constant number
+of macrostates $1/C_{M, 1}$ is slightly faster. The underperformance of the kinetically set number of macrostates could be cause by the challenge to accurately determine the timescales for partially sampled energy landscapes.
 
+The two adaptive sampling strategies with \emph{a priori} information $Q_{f}$ and $Q_{f,nn}$ show significant improvement over $1/C_{K, 1}$, which is the best strategy without \emph{a priori} information. If the \emph{a priori} information is accurate then this can speed up the folding of the protein significantly. Depending on the protein the improvement with the \emph{a priori} information can be less than 50
+\% or a factor 2-3x. The effectivity of including dimension of \emph{a priori} information to prevent misfolded states in  $Q_{f,nn}$ varies on the protein, but no significant performance penalties are observed.
+
+The two benchmark strategies $p_{esc}$ and $t_{opt}$ show very different performance. The strategy optimized to fold proteins $t_{opt}$  shows the upper limit for protein folding speed up with adaptive sampling. This benchmark shows an 2x or more improvement compared to strategies with no \emph{a priori} information, allowing a gap for the improvement of adaptive sampling strategies. Previously the upper limit for performance of protein folding with adaptive sampling was unknown. The $t_{opt}$ strategy is in some proteins close to the performance of $Q_{f,nn}$, the best strategy with \emph{a priori} information. The similar performance can be cause due to the simple protein folding pathway. For other proteins the $t_{opt}$ strategy is significantly faster than $Q_{f,nn}$, showing that adaptive sampling strategies with \emph{a priori} information have opportunities to improve. The strategy optimized to explore all states undiscrimatedly $p_{esc}$ isn't effective in folding proteins. The performance of the adaptive sampling strategies is consistent between different protein, allowing to conclude that adaptive sampling is effective for different topologies, both $\alpha$-helices and $\beta$ sheets.
 
 \subsection{\label{sec:time-explore}Time to explore 95\% of states}
 
@@ -257,24 +118,14 @@ Fig.~\ref{fig:Time_fold}) can be found in the Supplementary material.
   %%\centering
   \begin{subfigure}[t]{0.5\textwidth}
     \includegraphics[width=0.9\textwidth]{figures/CLN025_7_steps10000_nparallel100_explore.eps}
-    %%\caption{Chignolin}   
-    %%[width=\textwidth] 
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/1FME_7_steps10000_nparallel100_explore.eps}
-    %%\caption{WW Domain}    
+    \includegraphics[width=0.9\textwidth]{figures/1FME_7_steps10000_nparallel100_explore.eps}   
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/A3D_7_steps10000_nparallel100_explore.eps}
-    %%\caption{$\lambda$-repressor}    
+    \includegraphics[width=0.9\textwidth]{figures/A3D_7_steps10000_nparallel100_explore.eps}   
   \end{subfigure}
-  %%\includegraphics[width=\textwidth]{figures/UVF_7_steps10000_nparallel100_explore.eps}
-  \caption{Comparison of the number of steps required to explore 95\% of the
-  configurational space for different adaptive sampling strategies for three
-  different protein models, by using 100 parallel trajectories. The 20\% and
-  80\% percentiles are shown as the error bars.
-  The results of the t-test between MD and the
-  individual strategies for the different proteins are reported in the Supplementary material.}
+  \caption{Time to the exploration of 95\% of the states for the different sampling strategies for proteins Chignolin, BBA and $\alpha$3D.}
   \label{fig:Time_explore}
 \end{figure}
 
@@ -417,6 +268,8 @@ Nueske2017}, significantly improve the adaptive sampling of a
 protein folding process with respect to a simple estimation of the MSM directly
 from non-equilibrium transition counts.
 
+X koppman just partial correction, estimate of effect
+
 Different considerations are important if the goal of adaptive sampling is to
 speedup the exploration of any new regions of the configurational space of a
 protein system. In this case, it appears that the most efficient adaptive
@@ -471,3 +324,18 @@ presented here.
 
 
 X Discuus approcimation markov chain trajetcorie to molecular dynamics trajctories 
+
+
+
+The results of this analysis reveal that different strategies are needed
+for different goals. In particular, on-the-fly estimation of global
+equilibrium properties from non-equilibrium data is very important to speedup
+the folding of a protein, while the knowledge of equilibrium properties is not
+needed if the goal is the exploration of large regions of the conformational
+space (independently if folded or unfolded). This result suggests that
+different strategies may need to
+be combined in various stages of a specific application to both enhance the
+occurrence of a rare event and appropriately sample the different metastable states.
+Comparison of the results on different proteins
+suggest that the speedup that can be achieved by adaptive sampling is larger
+for slower processes, thus encouraging the application to more complex systems.
