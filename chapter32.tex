@@ -99,7 +99,7 @@ In each case a parallelization $n$ of 100 replicas is chosen, except for the sca
 \end{figure}
 
 
-The time to folding of the protein is the most common objective of adaptive sampling. Figure~\ref{fig:Time_fold} shows the performance of different adaptive sampling strategie with Markov Chain trajectories.
+The time to folding of the protein is the most common objective of adaptive sampling. Figure~\ref{fig:Time_fold} shows the performance of different adaptive sampling strategies with Markov Chain trajectories.
 Each sampling strategy should be compared with plain MD which is the reference sampling strategy.
 The simple $cmicro$/$1/C$ strategy shows no speed up for Chignolin, WW Domain and only a small 2x speed up for $\alpha$3D. This shows that the $cmicro$ strategy is not optimal for folding proteins. The reason for the low efficiency lies in the oversampling of states which are not on the folding path, but have a low stationary probability and high restart probability.
 
@@ -129,213 +129,91 @@ The two benchmark strategies $p_{esc}$ and $t_{opt}$ show very different perform
   \label{fig:Time_explore}
 \end{figure}
 
-Figure~\ref{fig:Time_explore} shows the average time needed for the different
-adaptive sampling strategies to explore 95\% of the microstates constituting the
-MSM, by using 100 parallel trajectories, for three different proteins.
-In this comparison we exclude the strategies designed to speedup the sampling
-of the folding process (such as the native contact based strategies as well as
-$t_{opt}$) because they are not designed for the purpose of general exploration.
-The comparison shows that, in general, the $1/C$ strategy explores the
-configurational space much more efficiently than plain MD. The speedup obtained
-by the $1/C$ strategy nears the theoretical maximum obtained by the optimal
-exploration strategy, $p_{esc}$. Within the macrostate-based strategies, there
-is more variance. The strategies using the regular count matrix $(1/C_M^C)$ outperform
-the strategies that correct for non-equilibrium errors, $(1/C_M^K)$. This is
-likely because the correction introduces a bias towards the sampling of slow
-processes rather than general exploration. The non-equilibrium error in the
-count matrix based strategies introduces randomness that helps the sampling of
-unexplored microstates. Additionally, for some proteins the optimization of the number of
-macrostates based on the kinetic content ($1/C_{M, 2}$) does appear to provide
-an advantage over the use of a constant number of macrostates ($1/C_{M, 1}$). 
-The use of the kinetic content allows for a more accurate estimation of
-macrostate counts, which could help to focus the sampling bias towards regions
-that are less densely sampled. 
-The patterns shown in Fig.~\ref{fig:Time_explore}
-are consistent across all the proteins and across the number of
-parallel trajectories used. The corresponding plots for all the proteins can be
-found in the Supplementary material.
+The time to explore the whole energy landscape is an alternative metric to evaluate the effectivity of adaptive sampling. Figure~\ref{fig:Time_explore} shows the average time needed to explore 95\% of the microstates for different adaptive sampling strategies with Markov Chain trajectories.
+The results show that the adaptive sampling strategies show a different performance for this metric. Comparing to the protein folding metric, the $cmicro$ strategy performs better for the exploration metric and the $cmacro$  startegy performs relatively worse for the exploration metric. Despite the worse performance of $cmacro$, for some proteins lie Chignolin it's the fastest strategy. 
+
+
+For some proteins such as Chignolin the $p_{esc}$ strategy is slower than the $(1/C_M^C)$ strategy. This is caused by the rare transition barrier in folding landscape. The $p_{esc}$ is an greedy algorithm and doesn't take the rare transition barrier into account. The $t_{opt}$ strategy was not shown in Fig.~\ref{fig:Time_explore}, since this strategy never explores the 95\% of the states. This is expected, since this strategy is optimized for a different objective.
+Surprizingly, the strategies $cmacro$ strategies with regular MSM $(1/C_M^C)$ outperform
+the strategies with corrected MSM $(1/C_M^K)$. This unexpected result is probably cause by the correction, which biases the sampling towards slow processes and away from general exploration.
+
+It's unclear which variant of the $cmacro$ strategy for the number of macrostates perform better due to the variance of performance between the proteins. For the metric of exploration the strategies $cmicro$ or  $(1/C_M^C)$ are preferable. 
 
 \subsection{\label{sec:scaling}Scaling}
 
 \begin{figure}[H]
-  %%\centering
+  \begin{subfigure}[t]{0.5\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures/1FME_6_steps10000_scaling_explore_total.eps}   
+  \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
     \includegraphics[width=0.9\textwidth]{figures/GTT_6_steps10000_scaling_fold0.eps}    
   \end{subfigure}
   \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/1FME_6_steps10000_scaling_explore.eps}
-    %%\caption{$\lambda$-repressor}    
+    \includegraphics[width=0.9\textwidth]{figures/1FME_6_steps10000_scaling_explore.eps}   
   \end{subfigure}
-  \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/1FME_6_steps10000_scaling_explore_total.eps}
-    %%\caption{$\lambda$-repressor}    
-  \end{subfigure}
-  \caption{Top: Scaling of the absolute folding time required to fold the
-  protein model for the WW Domain for 5 different sampling strategies: plain
-  $MD$, $p_{esc}$, $t_{opt}$, $1/C$ and $1/C_{M,2}^K$. Scaling of the
-  absolute (middle) or cumulative (bottom) number of steps required to explore
-  95\% of all microstates, for the protein  model of BBA, for 3 different
-  strategies: plain $MD$, $p_{esc}$, $1/C$ and $1/C_{M,2}^K$.  
-  The 20\% and 80\% percentiles are shown as error bars. 
-  Similar figures for the other
-  protein models are reported in the Supplementary material.}
+
+  \caption{Top] Scaling of the
+  absolute (left) or cumulative (right) number of steps required to explore
+  95\% of all microstates. Strategies plain $MD$, $p_{esc}$, $1/C$ and $1/C_{M,2}^K$ for the protein BBA. 
+  Bottom] Scaling of the absolute folding time for sampling strategies; plain
+  $MD$, $p_{esc}$, $t_{opt}$, $1/C$ and $1/C_{M,2}^K$ for WW Domain.
+  }
   \label{fig:scaling}
 \end{figure}
 
-Adaptive sampling methods capitalize on the use of many relatively short
-parallel trajectories, usually deployed on massively parallel computers (MPC),
-to speed up rare events or explore protein conformational spaces. In order to
-better understand the limits of scalability of adaptive sampling strategies,
-the measured absolute folding time for different parallelization is shown in
-Figure \ref{fig:scaling}. The absolute folding time indicates the actual clock
-time required to record a folding event for a given protein on MPC with a given
-adaptive sampling strategy. The different strategies exhibit good scaling below
-a parallelization of around 100 and moderate scalability up to 1000 parallel
-trajectories. The scalability differs only slightly between different
-strategies, confirming that adaptive sampling generally scales well.
-Similar scaling is observed for all protein models. The time to explore 95\% of
-microstates in Figure \ref{fig:scaling} scales to a higher parallelization than
-the time to fold the protein. In addition to Fig.
-\ref{fig:scaling}, scaling plots for the other protein models are
-available in the Supplementary material. 
+The scalablity of adaptive sampling is important for both application and understanding of adaptive sampling.  Adaptive sampling is usually deployed on High-Performance Computers, which have a high parallelization available. Parallelization allows to shorten the time to solution by dividing the work among different GPUs, but only as long adaptive sampling scales well.
+The metric absolute time represents the time to solution, but is hardware and software independent and measures the length consecutive MD simulations. The cumulative/total time represents the computational resources necessary and is hardware and software independent as well and measures the sum of all lengths of MD simulations.
+Figure \ref{fig:scaling} shows how the time to folding and time to exploration depends on the parallelization. The absolute time descreases rapidly up to a parallelization of 100-1000. Any higher parallelization will not decrease the time to solution. This scaling limit depends on the protein, for larger proteins it's slightly higher. All adaptive sampling strategies scale similarly, but plain MD scales worse. This worse scaling of plain MD is explained by the lack of communication between the individual MD trajectories for plain MD. In contrast, adaptive sampling shares information between the different replicas, which allows adaptive sampling to scale better. The total time to explore shows that the computational resources necessary to sample a protein increase rapidly above the scaling limit of 100-1000. This increase of total time indicates a lower efficiency for utilization of the GPUs, but could be trade off to reducing the time to solution. For plain MD the computational resources necessary increase above 10 replicas or GPUs.
 
-\begin{figure}[H]
-  %%\centering
-  \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_t_opt_6_steps10000_52_0.eps}
-    %%\caption{$t_{opt}$}    
-  \end{subfigure}
-  \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_qcore_only_6_steps10000_52.eps}
-    %%\caption{$Q_f$}    
-  \end{subfigure}
-  \begin{subfigure}[t]{0.5\textwidth}
-    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_cmacro_kin_cont_50_6_steps10000_52.eps}
-    %%\caption{$1/C_{M,2}^K$}
-  \end{subfigure}
-  \caption{The relationship between the speedup of the folding time with $t_{opt}$, $Q_f$
-  or $1/C_{M,2}^K$ vs. mean first passage time for the 8 proteins. Results are reported for a
-  parallelization of 100, and the 20\% and 80\% percentiles are shown as error
-  bars. The speedup increases with longer MD folding time, the linear fit lines are drawn to guide the eye. The Pearson
-  correlation coefficient is for $t_{opt}$ 0.93, for $Q_f$ 0.95 and for
-  $1/C_{M,2}^K$ 0.82.}
-  \label{fig:compare-MD-speed-cmacro}
-\end{figure}
 
 
 \subsection{\label{sec:compare}Speedup for different proteins}
 
-The speedup in simulating the folding process achieved by using adaptive
-sampling in Figure~\ref{fig:Time_fold} varies for different proteins as each
-protein has different dynamic properties. In order to better understand the
-factors determining the speedup reachable with adaptive sampling strategies, we
-compare different properties over the different protein models.
 
-Figure \ref{fig:compare-MD-speed-cmacro} shows that, despite the small sample size
-and large error bars, there is a significant correlation between
-the theoretical maximum speedup in folding reachable with adaptive sampling
-($t_{opt}$) and the folding time of a protein model (as measured by the mean first passage time).
-Similar correlations appear for the speedup achieved by using an adaptive
-sampling strategy based on the number of macrostates explored upon correction
-for non-equilibrium effect ($1/C_{M, 2}$), and also when a reaction coordinate
-is used to guide the adaptive sampling ($Q_f$).
-That is, for slower folding proteins the efficiency of adaptive sampling
-strategies in accelerating the folding rare event increases. This result is
-very encouraging for the use of adaptive sampling strategies to sample slow
-processes, as adaptive sampling seems to perform better as the processes become
-slower. The large error bars are caused by the stochastic nature of the
-trajectories. 
-No significant correlation is observed between the speedup achieved in folding
-and additional properties such as the size of the protein (Figures in Supplementary material).
+\begin{figure}[H]
+  \begin{subfigure}[t]{0.5\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_cmacro_kin_cont_50_6_steps10000_52.eps}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.5\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_qcore_only_6_steps10000_52.eps}   
+  \end{subfigure}
+    \begin{subfigure}[t]{0.5\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures/compare_MD_speed_up_t_opt_6_steps10000_52_0.eps}
+  \end{subfigure}
+  \caption{Correlation between the speedup of the folding time vs. mean first passage time for the 8 proteins and adaptive sampling strategies $1/C_{M,2}^K$, $Q_f$ and $t_{opt}$.}
+  \label{fig:compare-MD-speed-cmacro}
+\end{figure}
+
+The previous figures showed a significant variance in performance between individual proteins. Plotting the speed up of folding time relative to plain MD in Figure~\ref{fig:Time_fold} allows to understand how protein size and folding time affects the adaptive sampling speed up. Despite the limited number of proteins investigated due to limited reference data, a relationship for adaptive sampling speed up is visible. All strategies shown $1/C_{M,2}^K$, $Q_f$ and $t_{opt}$ 0.93 increase the speed up with folding time for the protein. This dependency is roughly linear, with Pearson correlation coefficients is 0.82 for $1/C_{M,2}^K$, 0.95 for $Q_f$ and 0.93 for $t_{opt}$. The optimal strategy $t_{opt}$ and strategy with \emph{a priori} information have a higher correlation coefficient. The upper limit strategy for folding $t_{opt}$ reaches a speed up about 5 times of $1/C_{M,2}^K$ and about 50\% higher than $Q_f$. This show an apportunity for improved adaptive sampling strategies. All the proteins are relatively small due to limited reference data, but the increasing speed up for longer folding and larger protein allows predict that larger proteins can reach speed ups above 10x with $1/C_{M,2}^K$. The maximal possible speed up with adaptive sampling is not known. 
+
+\section{\label{sec:conclusion}Discussion}
 
 
-\section{\label{sec:conclusion}Conclusion}
+This systematic analysis of adaptive sampling strategies allows to compare different startegies with an improved statistical sampling.
+The effectivity of correcting the MSM for non-equilibrium sampling was demonstrated by the performance of $1/C_{M,2}^K$ for folding proteins. This result is limited by the approximation which was used to estimate the performance of correcting the MSM with Koopman method. For folding a protein the $1/C_{M,2}^K$ strategy is preferable, reaching a speed up up to 5x for the investigated small proteins. The most efficient adaptive sampling strategy is the based on the iterative identification of a kinetically disconnected macrostates with corrections for non-equilibrium effects.
 
-We have presented a systematic analysis of the performance of different
-adaptive sampling strategies by using as test systems 8 different discrete
-protein models defined from long all-atom MD simulations.
-We have shown that different adaptive sampling strategies are optimal for
-different goals. In particular, if the goal of adaptive sampling is to speedup
-the simulation of a rare event (such as a protein folding process), it is
-important to be able to analyze the explored space on-the-fly and extract a few
-metastable states from which new simulations can be restarted. In the data
-analysis, it is also important to take into account the effect of
-non-equilibrium sampling. Indeed, our results show that a more accurate
-estimation of an equilibrium MSM from short non-equilibrium simulations, that
-can be obtained by using corrections based on the estimation of the Koopman
-operator \cite{koopmanold, koopman2,koopman3,koopman4,  wu2017variational,
-Nueske2017}, significantly improve the adaptive sampling of a
-protein folding process with respect to a simple estimation of the MSM directly
-from non-equilibrium transition counts.
+Another result is that a different objective, such as exploring all the states, dramatically affects the speed up with adaptive sampling strategies. For exploration $cmicro$ or  $(1/C_M^C)$ strategies are preferable. 
+An unexplored consideration is the choice of multiple objectives. At the beginning of adaptive sampling the folding of the protein could be prioritized, later the exploration or increasing the accuracy of the kinetic results could be prioritized.
 
-X koppman just partial correction, estimate of effect
+The effectivity of adaptive sampling strategies with \emph{a priori} knowledge about the biomolecules has been confirmed. In some cases the speed up reaches the upper limit determined by $t_{opt}$ strategy. These strategies can be only used when the \emph{a priori} information is accurate. Inaccurate or intuitive reaction coordinates can lead to slow sampling of the biomolecule.
 
-Different considerations are important if the goal of adaptive sampling is to
-speedup the exploration of any new regions of the configurational space of a
-protein system. In this case, it appears that the most efficient adaptive
-sampling strategy is based on the on-the-fly identification of a large number
-of kinetic microstates from the simulations already performed, and corrections
-for non-equilibrium effects do not appear relevant.
-These results suggest that different strategies could be used in different
-stages of investigation of a given biophysical process. For instance, the
-sampling of rare events could be optimized in a first stage to discover slow
-processes in a new system of interest, followed by a second stage where the
-different metastable regions in the conformational space can be better sampled
-by an adaptive sampling strategy optimized for fast exploration.
+The newly developed upper limit strategy for folding time $t_{opt}$ shows effectively the maximal speed up with adaptive sampling, which is around 15x for the investigated small proteins. Larger speed ups are predicted for larger and slower folding proteins. The second upper limit strategy for exploration $p_{esc}$ is not a good benchmark, since in some cases the $cmacro$ strategy performed better. This is caused by the greedy algorithm nature of this upper limit strategy.
 
-We have compared the speedup achieved with the different adaptive sampling
-strategies with theoretically optimal benchmark strategies for these two
-different goals, $p_{esc}$ and $t_{opt}$, respectively.  The gap between the
-speedup of the theoretically optimal strategies and the best performers among
-the strategies presented suggest that there could be even faster 
-adaptive sampling methods and further investigation in this direction is underway.
+The results in this Chapter are limited by the approximation of molecular dynamics trajectories by Markov chain trajectories. This approximation allowed to increase the sample size of adaptive sampling by several orders of magnitude, but also introduces the inaccuracies of the generated MSM model. This inaccuracies of the MSM model were limited by careful generation of the MSM models. Additionally the effect of the Koopman method could be only approximated.
 
-We have also shown that, if there is a priori knowledge about the process
-under investigation, as for example a reaction coordinate, then adaptive
-sampling strategies for the sampling of rare events can be designed to achieve
-a speedup close to the theoretical maximum benchmark. In particular, we have
-shown that using the number of native (and non-native) contacts to guide the sampling, a
-significant improvement in the adaptive sampling of the folding process is
-obtained with respect to adaptive sampling strategies that do not use a priori
-knowledge of the system.
+The signficant performance gap between the $1/C_{M,2}^K$  strategy and the upper limit $t_{opt}$ shows an opportunity for more effective adaptive sampling strategies.
 
-The adaptive sampling strategies reported here scale well with parallelization
-up to about 1000 for the investigated systems.  This result generalizes what
-was reported in \cite{bowman2010enhanced} for different proteins. 
+Unexpectedly, plain MD simulations with a larger number of replicas than 100 increases the required computational resources, which shows a disadvantage of plain MD compared to adaptive sampling. Adaptive sampling scales well to 100-1000 replicas, this extends the results of \cite{bowman2010enhanced} for different proteins.  
 
-Although the best performing adaptive sampling strategies presented here show a
-robust speedup over plain MD over a number of different protein models, a significant
-variation in performance is observed. Interestingly, the
-speedup obtained with the best performing adaptive sampling strategies for
-the sampling of the folding process for different protein models correlates
-with the folding time as measured with plain MD simulations.
-Instead, the size of the proteins or the height of the folding free energy
-barrier for the different proteins do not appear to be a strong determinant for
-the speedup obtainable by adaptive sampling.
-A cautious extrapolation of the correlation between the adaptive sampling
-performance and the timescale of the folding rare event encourages the
-application of these methods for the characterization of slower processes,
-beyond the fast-folding proteins considered here. Due to the limited
-number of investigated proteins and the discrete nature of the models used,
-the upper limit of the speedup achievable with adaptive sampling methods
-for the sampling of rare events cannot be directly estimated from what is
-presented here.
+This result is encouraging for using adaptive sampling for higher number of replicas and larger, more complex proteins. Currently, adaptive sampling is limited by the significant computational resources to fold larger proteins. The cautious extrapolation of the adaptive sampling speed up for protein folding allows to predict speed up of excess of 10-times for larger proteins.
 
 
 
-X Discuus approcimation markov chain trajetcorie to molecular dynamics trajctories 
 
 
 
-The results of this analysis reveal that different strategies are needed
-for different goals. In particular, on-the-fly estimation of global
-equilibrium properties from non-equilibrium data is very important to speedup
-the folding of a protein, while the knowledge of equilibrium properties is not
-needed if the goal is the exploration of large regions of the conformational
-space (independently if folded or unfolded). This result suggests that
-different strategies may need to
-be combined in various stages of a specific application to both enhance the
-occurrence of a rare event and appropriately sample the different metastable states.
-Comparison of the results on different proteins
-suggest that the speedup that can be achieved by adaptive sampling is larger
-for slower processes, thus encouraging the application to more complex systems.
+
+
+
+
+
