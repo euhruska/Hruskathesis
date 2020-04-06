@@ -1,13 +1,9 @@
 \chapter{Motivation and Approach}
 
 \section{Adaptive sampling: Motivation}
-Physical systems come in many forms and shapes and 
-
-Intrinsic hierachical organisation
-
-Molecular dynamics (MD) simulations have become indispensable for gaining
+Physical systems come in many forms and shapes and show an intrinsic hierarchical organization. Molecular dynamics (MD) simulations have become indispensable for gaining
 insight into molecular systems at high spatial and temporal resolutions.
-However, a key limitation for MD with accurate all-atom force-fields remains
+However, a fundamental limitation for MD with accurate all-atom force-fields remains
 the computational demand for simulating processes with long timescales. In
 particular, biologically relevant processes, such as protein folding and
 conformational changes, typically require simulation time in excess of
@@ -16,8 +12,8 @@ timescales on the order of microseconds on standard computational resources.
 
 
 
-This thesis is about solving the challenge of accurately determining the confomational dynamics of high-dimensional stochastic systems. This challenge of high-dimensional stochastic dynamics   
-adaptive sampling of conformational dynamics, a method to efficiently obtain relevant information about the stationary and kinetic behavior of high-dimensional stochastic dynamics. This methods is especially usefull in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge which limits our understanding of the behavior of many systems. This includes the majority of biological processes.
+This thesis is about solving the challenge of accurately determining the conformational dynamics of high-dimensional stochastic systems. This challenge of high-dimensional stochastic dynamics 
+adaptive sampling of conformational dynamics, a method to efficiently obtain relevant information about the stationary and kinetic behavior of high-dimensional stochastic dynamics. This method is especially useful in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge that limits our understanding of the behavior of many systems. This includes the majority of biological processes.
 \RED{expand}
 adaptive sampling is one layer on top 
 of other tool. such as dimension reduction
@@ -99,6 +95,13 @@ Slower (rare) processes are associated with crossing high free energy barriers
 crossed, thus representing the typical bottleneck to MD simulations.
 
 \section{TICA}
+
+and an
+interpretability/analysis issues known as the curse of dimensionality (e.g., data from allatom
+MD is too highly-dimensional to be looked at by the naked eye). Both issues will be
+briefly addressed later.
+
+
 dimension reduction
 check  lorenzo chapter 2
 page 188, b./3
@@ -106,6 +109,18 @@ page 188, b./3
 scale sqaure rrot
 
 koppman approcimation
+
+
+One dimension reduction approach is using Time-lagged
+Independent Component Analysis (TICA) \cite{TICA1-perez2013, TICA2-schwantes2013} converts the raw trajectories in
+low-dimensional trajectories. The Koopman method \cite{koopmanold,
+koopman2,koopman3,koopman4, wu2017variational, Nueske2017} is used to reduce
+the non-equilibrium effects emerging from collecting many short MD trajectories.
+X koopman method
+ The
+resulting low-dimensional trajectories are scaled into a kinetic map
+\cite{Noe2015,noe2016commute}, which provides a measure of the kinetic distance
+between different configurations. 
 
 
 Time-lagged Independent Component Analysis (TICA) [100, 109, 110] is a dimensionality
@@ -120,9 +135,29 @@ These
 variational principle for conformational dynamics (VAC)
 
 
+K
+
+The fraction of kinetic content captured by the first m dimensions of the kinetic map is given by \cite{noe2016commute}
+
+$c_{m}=\frac{\sum_{i=1}^{m}t_{i}}{\sum_{i=1}^{n}t_{i}}$
+
+This expression can be used as a practical dimensionality reduction strategy as it provides the m dimensions (containing the m slowest processes) needed to explain a desired percentage (e.g., 95\% of the total kinetic content of the system.
+
+The Euclidean distance between the
+lower-dimensional points in the commute map space provides a good measure to
+obtain a kinetically meaningful state decomposition, and an associated MSM
+\cite{noe2016commute}.
+
+commute map
+kinetic map =
+
+detailed balance
+constraint. 
 \section{vampnet intro}
 vampnet intro
 
+Another dimension reduction approach implemented by default in ExTASY is a deep learning approach with state-free reversible VAMPnets (SRV) \cite{Mardt2018,chen2019jcp}. The SRVs can effectively achieve non-linear dimension reductions. The SRV originates from the same variational
+approach to conformational dynamics as TICA. The trajectory and the time-lagged trajectories are transformed with a neural network into dimension reduced trajectories. The dimension reduced trajectories are then used to calculate the VAMP-2 score, which is used as the loss function for the backpropagation to optimize the parameters of the neural network. The non-linear dimension reduction achieved with SRV improves the separation of different states. On advantage of SRVs is that SRVs can reach the same accuracy for time scales with shorter lag times than TICA. For adaptive sampling, the shorter lag time for analysis allows increasing the frequency of restarting trajectories which potentially improves adaptive sampling. In this case, the length of MD trajectories in each iteration is reduced and the number of iterations is increased.
 
 xy trajectory
 $$x_{t}$$
@@ -150,6 +185,16 @@ crossvalidation  - lorenzo fig5 6.1
 
 
 \section{MSM}
+
+The first two variations (named $1/C_{M,1}^C$ and $1/C_{M,2}^C$) make use of the count
+matrix $C_{ij}$ to directly estimate the on-the-fly MSM transition matrix. The count matrix
+$C_{ij}$ contains the number of transitions that have been recorded in previous
+iterations from state $i$ to state $j$. Every time a state is visited, the corresponding value
+in the count matrix is incremented by one. This count matrix is normalized such
+that each row sums to one and then used to estimate the on-the-fly MSM for the
+adaptive sampling strategies.
+
+
 check  lorenzo chapter 2
 mfpt
 eigenvectors
@@ -157,6 +202,27 @@ eigenvectors
 markovian property
 
 implied timescales equation 3.12
+
+
+The dimension reduced trajectories are then clustered with k-means into approximately 200 microstates,
+the detailed values for each protein are provided in the Supplementary Information. 
+A  maximum-likelihood estimation with a detailed balance
+constraint \cite{prinz2011markov} allows obtaining an MSM transition matrix 
+between every pair of microstates. All the analysis was
+performed using the PyEMMA Python package \cite{scherer2015pyemma}, which
+allows fast adjustments in the analysis step. The exact parameters for the MSM
+construction for each protein are listed in the
+Supplementary Information.
+
+
+The analysis is summarized by a transition matrix,
+$T_{ij}$, that indicates the probability that the system transitions from state
+$i$ to state $j$ within a chosen lag time $\tau$. The discretization of the
+original conformational space into states (also called microstates) is usually
+performed by clustering the configurations sampled by MD trajectories using
+a distance metric that can separate slowly mixing configurations from rapidly
+interconverting ones \cite{noe2016commute, Noe2015}.
+
 
 \section{energy landscape }
 energy landscape 
@@ -168,5 +234,5 @@ lronzeo fig 7.6
 
 state space
 
-
+state space $\varOmega\in\mathbb{R^{6n}}$, positions and momenta of the n atoms of the system)
 [12]
