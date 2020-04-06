@@ -6,66 +6,55 @@ insight into molecular systems at high spatial and temporal resolutions.
 However, a fundamental limitation for MD with accurate all-atom force-fields remains
 the computational demand for simulating processes with long timescales. In
 particular, biologically relevant processes, such as protein folding and
-conformational changes, typically require simulation time in excess of
+conformational changes, typically require simulation time orders of magnitule longer than
 milliseconds, while atomic-resolution MD trajectories can currently reach
-timescales on the order of microseconds on standard computational resources. 
+timescales on the order of milliseconds on available computational resources. 
 
-
-
-This thesis is about solving the challenge of accurately determining the conformational dynamics of high-dimensional stochastic systems. This challenge of high-dimensional stochastic dynamics 
-adaptive sampling of conformational dynamics, a method to efficiently obtain relevant information about the stationary and kinetic behavior of high-dimensional stochastic dynamics. This method is especially useful in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge that limits our understanding of the behavior of many systems. This includes the majority of biological processes.
-\RED{expand}
-adaptive sampling is one layer on top 
-of other tool. such as dimension reduction
-
-
+This thesis is about solving the challenge of accurately determining the conformational dynamics of high-dimensional stochastic systems. This method is especially useful in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge that limits our understanding of the behavior of many systems. This includes the majority of biological processes. Such a broad challenge requires many hierarchical approaches. Adaptive sampling is one of these approaches, which build on to of hardware advances and software advances of the molecular dynamics engines.
 
 \section{Outline}
  
-Overall this Dissertation resulted in several peer-reviewed publications \cite{Adstrategies2018, Extasy2016}, as well one publication under review \cite{Extasy2019}. The results obtained during my dissertation as well the results in the papers will be presented in the next chapters.
+ Overall this Dissertation resulted in several peer-reviewed publications \cite{Adstrategies2018, Extasy2016}, as well one publication under review \cite{Extasy2019}. The results obtained during my dissertation as well the results in the papers will be presented in the next chapters.
  
-Chapter \label{sec:background} will summarize some of the standard techniques, which will be used frequently throughout the thesis. While some of these approaches are commonly used in this field, there are also recently developed techniques which are less commonly used. The relevence of all these techniques for adaptive sampling will be highlighted. 
+Chapter 2 will summarize some of the standard techniques, which will be used frequently throughout the thesis. While some of these approaches are commonly used in this field, there are also recently developed techniques which are less commonly used. The relevence of all these techniques for adaptive sampling will be highlighted. 
 
-The theory of Adaptive sampling will be discussed in Chapter \label{ch:chapter3}, as well the derivation of the first upper limit of the adaptive sampling speed up will be show. This novel result shows that adaptive sampling can be further improved. 
-In the next chapter \label{ch:chapter32} the current strategies will be compared in statistically robust way and the effectivity of each strategy will be compared for different proteins and different goals.
+The theory of Adaptive sampling will be discussed in Chapter 3, as well the derivation of the first upper limit of the adaptive sampling speed up will be show. This novel result shows that adaptive sampling can be further improved. 
+In the next chapter 4 the current strategies will be compared in statistically robust way and the effectivity of each strategy will be compared for different proteins and different goals.
 
-Chapter \label{ch:chapter4} will introduce the computational tools and software frame works necessary to successfully and efficiently execute adaptive sampling. Due to the many subtasks adaptive sampling consists off, these practical consideration have a direct impact on the viability of adaptive sampling for solving sampling problems.
+Chapter 5will introduce the computational tools and software frame works necessary to successfully and efficiently execute adaptive sampling. Due to the many subtasks adaptive sampling consists off, these practical consideration have a direct impact on the viability of adaptive sampling for solving sampling problems.
 
-This developed software framework will be used in Chapter \label{ch:chapter5} to show for different biomolecular systems the results and the accuracy which adaptive sampling can achieve. 
+This developed software framework will be used in Chapter 6 to show for different biomolecular systems the results and the accuracy which adaptive sampling can achieve. 
 
-A final chapter \label{ch:conclude} will summarize the current achievements and discuss further open questions and possible directions.
+A final chapter will summarize the current achievements and discuss further open questions and possible directions.
 
 
 \afterpage{\null\newpage}
 \chapter{Background\label{sec:background}}
 
-\section{Biomolecules}
-
-\GRE{ 
-The behavior of a protein or any biomolecule can be represented by the xyz positions and velocities of all the . T}
-\RED{nice pic protein disease}
-
-
 \section{Proteins and Molecular Dynamics (MD)}
-\label{sec:MD}
-\GRE{ The behavior of a protein or any biomolecule can be represented by the xyz positions and velocities of all the . T}
-\RED{ image protein xyz}
-check lorenzo chapter 1
 
-The standard tool to access all of this information is Molecular Dynamics (MD), which is
-the science of simulating motion of a system of particles according to Newton’s classical
-equations of motion.
-The time evolution of a system of N atoms obeys the following Cauchy problem:
+The behavior of a protein or any biomolecule can be relatively accurately represented by Newton's classical equations of motion of all atoms. All 3N atom coordinates including the surrounding water solvent are represented by $\mathbf{x}_{t}$ positions and $\mathbf{v}_{t}$ velocities. The Newton's classical equations of motion are:
 
-X 2 R3N denotes the full Cartesian vector of the system
+$$M\ddot{x_{t}}=-\nabla U(\mathbf{x}_{t})$$
+The Hamiltionian $U()$ represents the all-atom force field guiding. The straightforward approach of numerically solving this equation leads to a molecular dynamics (MD) trajectory describing the motion of a protein. This Hamiltonian approximates the quantummechanics dynamics of the protein and is continously improved. Increased accuracy compared to the all-atom approach would require a quantummechanical approach, which reduces the reacheble timescales by several order of magnitude.  In this thesis the CHARMM22* force field \cite{Charmm22star} with modified TIP3P water was utilized.
 
-classical equations of motion,
-$$M\ddot{X_{t}}=-\nabla U(x_{t})$$
-3N atomic ccoridnates
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures3/lambda-repressor.png} 
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\textwidth}
+    \includegraphics[width=0.9\textwidth]{figures3/ww-domain.png}  
+  \end{subfigure}
+  \caption{Structure of proteins $\lambda$-repressor and WW domain.}
+  \label{fig:NN}
+\end{figure}
+
+
+The CHARMM force field has the following hamiltonian and consists of terms for molecular bonds stretching, angle bending, dihedral and improper dihedral energy terms, the Urey-Bradley component, van der Waals interactions (Lennard-Jones) and Coulomb interactions. 
 
 $$U_{CHARMM}=U_{bonds}+U_{angle}+U_{dihedral}+U_{improper}+U_{UB}+U_{LJ}+U_{elec}$$
 
-equation for charmm22
 \begin{equation}
 \begin{aligned}
 U(r_{i})={} &\sum_{bonds}K_{b}(b-b_{0})^{2}+\sum_{angles}K_{\theta}(\theta-\theta_{0})^{2}+\sum_{torsions}K_{\phi}\left(1+cos(n\phi-\delta)\right)\\
@@ -74,25 +63,9 @@ U(r_{i})={} &\sum_{bonds}K_{b}(b-b_{0})^{2}+\sum_{angles}K_{\theta}(\theta-\thet
 \end{aligned}
 \end{equation}
 
-where $k_b$ is the bond force constant and $b-b_0$ is the distance from equilibrium that the atom has moved. The second term in the equation accounts for the bond angles where $k_\theta$ is the angle force constant and $\theta-\theta_0$ is the angle from equilibrium between 3 bonded atoms. The third term is for the dihedrals (a.k.a. torsion angles) where $k_\phi$ is the dihedral force constant, $n$ is the multiplicity of the function, $\phi$ is the dihedral angle and $\delta$ is the phase shift. The fourth term accounts for the impropers, that is out of plane bending, where $k_\omega$ is the force constant and $\omega-\omega_0$ is the out of plane angle. The Urey-Bradley component (cross-term accounting for angle bending using 1,3 nonbonded interactions) comprises the fifth term, where $k_U$ is the respective force constant and $U$ is the distance between the 1,3 atoms in the harmonic potential. Nonbonded interactions between pairs of atoms $(i,j)$ are represented by the last two terms. By definition, the nonbonded forces are only applied to atom pairs separated by at least three bonds. The van Der Waals (VDW) energy is calculated with a standard 12-6 Lennard-Jones potential and the electrostatic energy with a Coulombic potential. In the Lennard-Jones potential above, the $R_{{min}_{ij}}$ term is not the minimum of the potential, but rather where the Lennard-Jones potential crosses the x-axis (i.e. where the Lennard-Jones potential is zero). In order to run the MD simulations, we need to be sure that our parameter file has all the terms specified in the energy function we are using (i.e. the equation specified above). 
+Here the parameters are: $k_b$ is the bond force constant, $b-b_0$ is the atom distance from equilibrium, $k_\theta$ is the angle force constant, $\theta-\theta_0$ is the angle from equilibrium between 3 bonded atoms, $k_\phi$ is the dihedral force constant, $n$ is the multiplicity of the dihedral function, $\phi$ is the dihedral angle, $\delta$ is the phase shift, $k_\omega$ is the improper dihedrals force constant, $\omega-\omega_0$ is the out of plane improper dihedrals angle, $R_{{min}_{ij}}$ is the constant for the Lennard-Jones potential potential, $r_{ij}$ is the distance between a pair of atoms and $q_{i}$ is the charge of an atom. The Urey-Bradley component serves the cross-term accounting for angle bending using 1,3 nonbonded interactions, where $k_U$ is force constant and $U$ is the distance between the 1,3 atoms in the harmonic potential.
 
-The graphics cards can currently simulate almost 1 microsecond of MD trajectory per day of simulation time for smaller proteins. The Special purpose hardware can simulate up to 100 microseconds of MD trajectory per simulation day, but the major limitation of the special-purpose hardware is the very limited access to these machines. 
-
-
-
-
-typical tiem steps 2-5fs, with GPUS below 1 microsecond/day paralelliazation
-
-Anton cite for small system up to 100microseconds/day
-
-timescales  
-for biomolecus protein folding and other global strc
-other global structural rearrangements of the order of
-$10^{-1}$ - $10^{1}$s.
-
-Slower (rare) processes are associated with crossing high free energy barriers
-(in an appropriate coordinate space) which is likely to take many trials and time to be
-crossed, thus representing the typical bottleneck to MD simulations.
+One challenge of this straightforward approach of the Newton's classical equations of motion for the proteins is the relatively short timestep. The commonly used maximum timestep allowing for energy conservation and stability of the protein is between 2fs and 5f. Considering most proteins fold on timescales longer than milliseconds, this requires to simulate $10^{12}$ steps. With modern GPUs, for smaller proteins almost 1 microseconds of molecular dynamics trajectory can be simulated per day. Special purpose hardware \cite{shaw2014anton} can simulate up to 100 microseconds of MD trajectory per simulation day, but the access to this special purpose hardware is limited. To simulate the behavior of most biomolecules for relevant processes such as protein folding and other global structural rearangements requires timescales of around $10^{-2} - 10^{1}$s. These slow processes are associated with the rare crossing of high free energy barriers, representing a bottleneck for the MD simulations.
 
 \section{TICA}
 
@@ -120,7 +93,7 @@ X koopman method
  The
 resulting low-dimensional trajectories are scaled into a kinetic map
 \cite{Noe2015,noe2016commute}, which provides a measure of the kinetic distance
-between different configurations. 
+between different conformations. 
 
 
 Time-lagged Independent Component Analysis (TICA) [100, 109, 110] is a dimensionality
@@ -176,7 +149,7 @@ $$L=\left\Vert C_{00}^{-1/2}C_{01}C_{11}^{-1/2}\right\Vert ^{2}$$
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.4\linewidth]{figures3/NN.png}
-  \caption{NN}
+  \caption{Schematics of the state-free reversible VAMPnets (SRV).}
   \label{fig:NN}
 \end{figure}
 
@@ -219,14 +192,14 @@ The analysis is summarized by a transition matrix,
 $T_{ij}$, that indicates the probability that the system transitions from state
 $i$ to state $j$ within a chosen lag time $\tau$. The discretization of the
 original conformational space into states (also called microstates) is usually
-performed by clustering the configurations sampled by MD trajectories using
-a distance metric that can separate slowly mixing configurations from rapidly
+performed by clustering the conformations sampled by MD trajectories using
+a distance metric that can separate slowly mixing conformations from rapidly
 interconverting ones \cite{noe2016commute, Noe2015}.
 
 
 \section{energy landscape }
 energy landscape 
-folding funnel
+folding funnel \cite{bryngelson1995p}
 focker planck equation
 
 Boltzmann distribution - lornezo

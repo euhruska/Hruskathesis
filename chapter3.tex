@@ -11,7 +11,7 @@ for protein dynamics. J. Chem. Phys. 149 (2018)
 
 \section{Sampling Problem}
 
-The stochastic behavior of biomolecules requires a good sampling of the process to understand the configurational behavior of the proteins accurately. This sampling can be done by molecular dynamics, and for small biomolecules such as peptides, this approach reaches a sufficient sampling. Larger biomolecules pose a significantly larger challenge to sample well. One cause are the slow collective motions that have long timescales. Figure~\ref{fig:raretransitions} illustrates that in many cases, there are rare transitions across a rare transition barrier. Simulating a longer molecular dynamics trajectory on one side of the barrier leads to a good sampling of one side of the barrier, but a low probability of crossing the rare transition barrier. This bottleneck causes an oversampling of the area on one side on the transition barrier.  
+The stochastic behavior of biomolecules requires a good sampling of the process to understand the conformational behavior of the proteins accurately. This sampling can be done by molecular dynamics, and for small biomolecules such as peptides, this approach reaches a sufficient sampling. Larger biomolecules pose a significantly larger challenge to sample well. One cause are the slow collective motions that have long timescales. Figure~\ref{fig:raretransitions} illustrates that in many cases, there are rare transitions across a rare transition barrier. Simulating a longer molecular dynamics trajectory on one side of the barrier leads to a good sampling of one side of the barrier, but a low probability of crossing the rare transition barrier. This bottleneck causes an oversampling of the area on one side on the transition barrier.  
 
 \begin{figure}[H]
   \centering
@@ -20,11 +20,11 @@ The stochastic behavior of biomolecules requires a good sampling of the process 
   \label{fig:raretransitions}
 \end{figure}
 
-Figure~\ref{fig:raretransitions} shows the free energy landscape along on a reaction coordinate. The high sampling at the bottom of the free energy wells is caused by the Boltzman distribution, which describes the equilibrium probability density of configuration space for biomolecules. The equilibrium probability density $\pi$ is:
+Figure~\ref{fig:raretransitions} shows the free energy landscape along on a reaction coordinate. The high sampling at the bottom of the free energy wells is caused by the Boltzman distribution, which describes the equilibrium probability density of conformation space for biomolecules. The equilibrium probability density $\pi$ is:
 
 $$\pi(x)~e^{-F(x)/(k_{B}T)}$$
 
-Here $F(x)$ is the free energy at reaction coordinate point $x$. The limited computational resources make long simulation times to sample the whole phase space of the biomolecules suboptimal. The computing power could be redirected to sample the rare transition barrier or the undersampled side of the transition barrier. For proteins, the rare transition barrier could be protein folding or other large-scale configurational changes.
+Here $F(x)$ is the free energy at reaction coordinate point $x$. The limited computational resources make long simulation times to sample the whole phase space of the biomolecules suboptimal. The computing power could be redirected to sample the rare transition barrier or the undersampled side of the transition barrier. For proteins, the rare transition barrier could be protein folding or other large-scale conformational changes.
 
 
 \section{\label{sec:intro2}Alternative sampling approaches}
@@ -35,7 +35,7 @@ One approach is to simulate longer molecular dynamics trajectories by software a
 
 Another approach, incentivized by the increase in parallelization of High-Performance Computers, is the simulation of many simultaneous trajectories \cite{DistComp-Shirts2000, DistComp-Buch2010}. The sampling is performed in parallel for the same system, and by analyzing the resulting trajectories, a better sampled result is obtained.  As shown in Chapter 4, the total efficiency of sampling is reduced due to the independent nature of the sampling, but the absolute simulation time or the time to solution is reduced.
 
-Monte Carlo is commonly used to improve the simulations of many stochastic systems. Here the sampling is not constrained to a hypersurface of conserved Hamiltonians, as is the case of molecular dynamics. This allows Monte Carlo to perform large jumps in configuration space, which is impossible in molecular dynamics. The high dimensionality of biomolecular systems reduces the effectivity of Monte Carlo Simulations, which doesn't represent well the collective motions of biomolecules. The approach of Hybrid Monte Carlo attempts to combine the strength of both Monte Carlo and MD, by including information of the intermolecular forces in the Monte Carlo moves. This approach is promising but wasn't yet able to reach longer timescales for biomolecules than other approaches. 
+Monte Carlo is commonly used to improve the simulations of many stochastic systems. Here the sampling is not constrained to a hypersurface of conserved Hamiltonians, as is the case of molecular dynamics. This allows Monte Carlo to perform large jumps in conformation space, which is impossible in molecular dynamics. The high dimensionality of biomolecular systems reduces the effectivity of Monte Carlo Simulations, which doesn't represent well the collective motions of biomolecules. The approach of Hybrid Monte Carlo attempts to combine the strength of both Monte Carlo and MD, by including information of the intermolecular forces in the Monte Carlo moves. This approach is promising but wasn't yet able to reach longer timescales for biomolecules than other approaches. 
 
 
 Modifying the Hamiltonian of the biomolecules is another common approach to solving the sampling problem. Here the Free energy barrier is reduced by adding terms to the original Hamiltonian of the biomolecules.
@@ -49,7 +49,7 @@ The reduced free energy barrier leads to shorter timescales necessary to sample 
 The general idea of \emph{adaptive sampling} \cite{singhal2005error, bowman2010enhanced,
 weber2011characterization, Fabritiis-2014, preto2014fast, doerr2016htmd,
 AdaptivePELE-Lecina2017, EvolutionCoupling-Shamsi2017, FAST-Bowman-2015, 
-Strategies-erros-reduce, plattner2017complete, Adstrategies2018} is the ``divide and conquer`` approach. Simulating shorter molecular dynamics trajectories allows changing the restarting points for the next short molecular dynamics trajectories. The choice of this restarting points is a key element of this thesis. Figure~\ref{fig:branching} illustrates that the free choice of restarting points allows to clone configurations and sample certain areas of the energy landscape better. The black crosses in the figure indicate areas where sampling is blocked, reducing the utilization of computational resources in some areas.
+Strategies-erros-reduce, plattner2017complete, Adstrategies2018} is the ``divide and conquer`` approach. Simulating shorter molecular dynamics trajectories allows changing the restarting points for the next short molecular dynamics trajectories. The choice of this restarting points is a key element of this thesis. Figure~\ref{fig:branching} illustrates that the free choice of restarting points allows to clone conformations and sample certain areas of the energy landscape better. The black crosses in the figure indicate areas where sampling is blocked, reducing the utilization of computational resources in some areas.
 Adaptive sampling allows the use of multiple parallel simulations and is therefore effective on High-Performance Computers (HPC).
 
 \begin{figure}[h]
@@ -73,18 +73,18 @@ molecular dynamics trajectories. Figure~\ref{fig:schema2} shows the initializati
 
 The individual adaptive sampling steps are summarized as follows:
 \begin{itemize}
-\item Start: Initialization of the start configurations.  Commonly an unfolded structure of the selected proteins is chosen.
-\item Step 1: Simulating an ensemble of MD trajectories. The configurations are chosen either by Initialization or Step 4. 
+\item Start: Initialization of the start conformations.  Commonly an unfolded structure of the selected proteins is chosen.
+\item Step 1: Simulating an ensemble of MD trajectories. The conformations are chosen either by Initialization or Step 4. 
 \item Step 2: Analysis of all previously generated MD trajectories. The analysis varies between adaptive sampling strategies.
 \item Step 3: Stop condition. Automatic determination if the objective of adaptive sampling is achieved. When the objective is not achieved, proceed iteratively to Step 4. 
-\item Step 4: Selection of restart configurations for the next set of MD trajectories based on the analysis results 
+\item Step 4: Selection of restart conformations for the next set of MD trajectories based on the analysis results 
 \end{itemize}
 
-The beginning step of any adaptive sampling is the initialization. The start configuration from where adaptive sampling is launching is chosen. For each replica, which depends on the parallelization of the computational resource, a configuration is generated. The start configuration can be all identical or disparate. For proteins commonly an unfolded state is chosen.
+The beginning step of any adaptive sampling is the initialization. The start conformation from where adaptive sampling is launching is chosen. For each replica, which depends on the parallelization of the computational resource, a conformation is generated. The start conformation can be all identical or disparate. For proteins commonly an unfolded state is chosen.
 In step 1, the MD simulations for all replicas are performed in a parallelized mode. Here most of the computational resources are utilized, and scalability of this step is crucial. Commonly  
 Following the MD simulation is the analysis of the MD trajectories in step 2. In the following Chapters 5 and 6, the adaptive sampling strategies $cmicro$ and $cmacro$ with Markov State Models \cite{prinz2011markov} are used as described in this Chapter. 
 
-The results of Step 2 allow determining in Step 3 if the objectives of adaptive sampling are reached. Examples for the objectives are protein folding, achieving a certain accuracy in protein dynamics, or exploration of a part of the energy landscape corresponding to a smaller-scale motion of the protein. If the objective is not reached, Step 4 creates the restarting configuration for the next MD trajectories corresponding to Step 1. The adaptive sampling strategies to determine the restarting points in Step 4 in Figure~\ref{fig:schema2} are easily exchangeable, such as the strategies discussed below. Once the objective in Step 3 is reached, adaptive sampling finishes and all trajectories can be further analyzed. Here usually, the dimension reduction and analysis methods used for restarting are utilized to obtain accurate stationary and dynamics information about the biomolecule.
+The results of Step 2 allow determining in Step 3 if the objectives of adaptive sampling are reached. Examples for the objectives are protein folding, achieving a certain accuracy in protein dynamics, or exploration of a part of the energy landscape corresponding to a smaller-scale motion of the protein. If the objective is not reached, Step 4 creates the restarting conformation for the next MD trajectories corresponding to Step 1. The adaptive sampling strategies to determine the restarting points in Step 4 in Figure~\ref{fig:schema2} are easily exchangeable, such as the strategies discussed below. Once the objective in Step 3 is reached, adaptive sampling finishes and all trajectories can be further analyzed. Here usually, the dimension reduction and analysis methods used for restarting are utilized to obtain accurate stationary and dynamics information about the biomolecule.
 
 
 \section{\label{sec:intro2}Adaptive sampling strategies}
@@ -176,10 +176,10 @@ non-native contacts, and $k_1, k_2$ are setting the strength of the sampling pre
 
 \subsubsection{Additional restarting strategies}
 Some additional restarting strategies are the following:
-DeepDriveMD\cite{leeDeepDriveMDDeepLearningDriven2019} restarts from outlier points detected by the Density-based spatial clustering methods DBSCAN. This approach depends on the effectivity of the dimension reduction of the molecular dynamics trajectories. CoCo-MD extrapolates the restarting points outside of the already sampled configurations based on PCA projection\cite{shkurti2019jctc,harada2015jctc,harada2017jctc}.  
+DeepDriveMD\cite{leeDeepDriveMDDeepLearningDriven2019} restarts from outlier points detected by the Density-based spatial clustering methods DBSCAN. This approach depends on the effectivity of the dimension reduction of the molecular dynamics trajectories. CoCo-MD extrapolates the restarting points outside of the already sampled conformations based on PCA projection\cite{shkurti2019jctc,harada2015jctc,harada2017jctc}.  
 
 All these adaptive sampling restart strategies have similar, but not identical goals.
-Some of these goals are the faster crossing of rare transition barriers, such as protein folding, of accurate configurational dynamics results, or sampling of a small part of the energy landscape.
+Some of these goals are the faster crossing of rare transition barriers, such as protein folding, of accurate conformational dynamics results, or sampling of a small part of the energy landscape.
 The effectiveness of the individual adaptive sampling strategies for each of these goals is, in many cases, unclear. Studies \cite{preto2014fast,weber2011characterization,bowman2010enhanced,Fabritiis-2014} report speedup of protein folding with adaptive sampling between 2 and 10, but in most cases, these studies have small sample size. Chapter 4 evaluates some of the adaptive sampling strategies for two different goals: crossing a rare transition barrier, such as the folding of a protein and the speedup of the exploration of large regions of the conformational space of a protein.
 
 \subsection{plain MD} 
@@ -196,7 +196,7 @@ First, we calculate for each visited microstate $i$ the probability of transitio
 
 $$p_{esc}[i]=\sum_{j \in unexplored}T[i, j]$$
 
-For this optimal strategy, the next restarting configuration is chosen from the state with the highest $p_{esc}$. The performance of this upper limit on exploration speed is investigated in Chapter 4.
+For this optimal strategy, the next restarting conformation is chosen from the state with the highest $p_{esc}$. The performance of this upper limit on exploration speed is investigated in Chapter 4.
 
 \subsection{Optimal strategy for protein folding: $t_{opt}$} 
 
