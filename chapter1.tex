@@ -1,20 +1,20 @@
 \chapter{Motivation and Approach}
 
 \section{Adaptive sampling: Motivation}
-Physical systems come in many forms and shapes and show an intrinsic hierarchical organization. Molecular dynamics (MD) simulations have become indispensable for gaining
-insight into molecular systems at high spatial and temporal resolutions.
+Biomolecules fulfill many different roles in nature and have accordingly a wide range of timescales associated with the conformational dynamics of the biomolecule. Molecular dynamics (MD) simulations have become indispensable for gaining
+insight into the behavior of biomolecules at high spatial and temporal resolutions.
 However, a fundamental limitation for MD with accurate all-atom force-fields remains
 the computational demand for simulating processes with long timescales. In
-particular, biologically relevant processes, such as protein folding and
-conformational changes, typically require simulation time orders of magnitude longer than
-milliseconds. At the same time, atomic-resolution MD trajectories can currently reach
-timescales on the order of milliseconds on available computational resources. 
+particular, many biologically relevant processes, such as protein folding and
+conformational changes, typically require simulation times orders of magnitude longer than
+milliseconds. In contract, atomic-resolution MD trajectories can currently reach only 
+timescales in the order of milliseconds. 
 
-This thesis is about solving the challenge of accurately determining the conformational dynamics of high-dimensional stochastic systems. This method is especially useful in the context of molecular dynamics (MD) of proteins. Proteins and the obtaining of accurate stationary and kinetic behavior of protein is a crucial unsolved challenge that limits our understanding of the behavior of many biological systems. Such a broad challenge requires many hierarchical approaches. Adaptive sampling is one of these approaches, which builds on top of hardware advances and software advances for the molecular dynamics engines.
+The ambition of this thesis is coming closer to solving the challenge of accurately determining the conformational dynamics of proteins. This challenge is immense due to the many orders of improvements necessary. Many approaches have been implemented which improve the sampling of proteins, including hardware advances, improved the molecular dynamics software. Some of the approaches are introduced in this chapter. One particular approach this thesis studies is the \emph{adaptive sampling}. Adaptive sampling uses many shorter MD trajectories to sample the protein energy landscape and the increased efficiency of sampling is reached by selecting the starting points of the MD trajectories based on the results of previous MD trajectories. This approach allows to sample more efficiently any high-dimensional stochastic systems, where proteins are a common example.
 
 \section{Outline}
  
- Overall this Dissertation resulted in several peer-reviewed publications \cite{Adstrategies2018, Extasy2016}, as well one publication under review \cite{Extasy2019}. The results obtained during this Dissertation, as well as the results in the papers, will be presented in the next chapters.
+Overall this Dissertation resulted in several peer-reviewed publications \cite{Adstrategies2018, Extasy2016}, as well one publication under review \cite{Extasy2019}. The results obtained during this Dissertation, as well as the results in the papers, will be presented in the next chapters.
  
 Chapter 2 will summarize some of the standard techniques, which will be used frequently throughout the thesis. While some of these approaches are commonly used in this field, there are also recently developed techniques that are less commonly used. The relevance of all these techniques for adaptive sampling will be highlighted. 
 
@@ -38,7 +38,7 @@ A final chapter will summarize the current achievements and discuss further open
 The behavior of a protein or any biomolecule can be relatively accurately represented by Newton's classical equations of motion of all atoms. All 3N atom coordinates, including the surrounding water solvent, are represented by $\mathbf{x}_{t}$ positions and $\mathbf{v}_{t}$ velocities. Figure~\ref{fig:proteins} shows the 3-dimensional structure of two proteins investigated in this thesis as an example. The Newton's classical equations of motion are:
 
 $$M\ddot{\mathbf{x}_{t}}=-\nabla U(\mathbf{x}_{t})$$
-The Hamiltonian $U()$ represents the all-atom force field guiding. The straightforward approach of numerically solving this equation leads to a molecular dynamics (MD) trajectory describing the motion of a protein. This Hamiltonian approximates the quantum-mechanical dynamics of the protein and is continuously improved. Increased accuracy compared to the all-atom approach would require a quantum-mechanical approach, which reduces the reachable timescales by several orders of magnitude.  In this thesis, the CHARMM22* force field \cite{Charmm22star} with modified TIP3P water was utilized.
+The potential energy $U()$ represents the all-atom force field guiding the motion of the protein. The straightforward approach of numerically solving this equation leads to a molecular dynamics (MD) trajectory describing the motion of a protein. This potential energy approximates the quantum-mechanical dynamics of the protein and new research continuously improves the accuracy of the all-atom force field compared to quantum-mechanical dynamics. Increased accuracy compared to the all-atom approach would require a quantum-mechanical approach, which reduces the reachable timescales by several orders of magnitude.  In this thesis, the CHARMM22* force field \cite{Charmm22star} with modified TIP3P water was utilized.
 
 \begin{figure}[H]
   \centering
@@ -53,21 +53,22 @@ The Hamiltonian $U()$ represents the all-atom force field guiding. The straightf
 \end{figure}
 
 
-The CHARMM force field has the following Hamiltonian, which consists of terms for molecular bonds stretching, angle bending, dihedral, improper dihedral energy terms, the Urey-Bradley component, van der Waals interactions (Lennard-Jones) and Coulomb interactions. 
+The CHARMM force field has the following potential energy, which consists of terms for molecular bonds stretching, angle bending, dihedral, improper dihedral energy terms, the Urey-Bradley component, van der Waals interactions (Lennard-Jones) and Coulomb interactions. 
 
-$$U_{\mathbf{x}}=U_{bonds}+U_{angle}+U_{dihedral}+U_{improper}+U_{UB}+U_{LJ}+U_{elec}$$
+$$$$
 
 \begin{equation}
 \begin{aligned}
-U(\mathbf{x})={} &\sum_{bonds}K_{b}(b-b_{0})^{2}+\sum_{angles}K_{\theta}(\theta-\theta_{0})^{2}+\sum_{torsions}K_{\phi}\left(1+cos(n\phi-\delta)\right)\\
+U(\mathbf{x})={}&U_{bonds}+U_{angle}+U_{dihedral}+U_{improper}+U_{UB}+U_{LJ}+U_{elec}
+&=\sum_{bonds}K_{b}(b-b_{0})^{2}+\sum_{angles}K_{\theta}(\theta-\theta_{0})^{2}+\sum_{torsions}K_{\phi}\left(1+cos(n\phi-\delta)\right)\\
 &+\sum_{impropers}k_{\omega}\left(\omega-\omega_{0}\right)^{2}+\sum_{Urey-Bradley}k_{u}\left(u-u_{0}\right)^{2}\\
 &+\sum_{nonbonded}\epsilon\left[\left(\frac{R_{min,ij}}{r_{ij}}\right)^{12}-\left(\frac{R_{min,ij}}{r_{ij}}\right)^{6}\right]+\sum_{electric}\frac{q_{i}q_{j}}{\epsilon r_{ij}}
 \end{aligned}
 \end{equation}
 
-Here the parameters are: $k_b$ is the bond force constant, $b-b_0$ is the atom distance from equilibrium, $k_\theta$ is the angle force constant, $\theta-\theta_0$ is the angle from the equilibrium between 3 bonded atoms, $k_\phi$ is the dihedral force constant, $n$ is the multiplicity of the dihedral function, $\phi$ is the dihedral angle, $\delta$ is the phase shift, $k_\omega$ is the improper dihedrals force constant, $\omega-\omega_0$ is the out of plane improper dihedrals angle, $R_{{min}_{ij}}$ is the constant for the Lennard-Jones potential, $r_{ij}$ is the distance between a pair of atoms and $q_{i}$ is the charge of an atom. The Urey-Bradley component serves the cross-term accounting for angle bending using 1,3 nonbonded interactions, where $k_{u}$ is the Urey-Bradley force constant, and $u-u_{0}$ is the distance between the 1,3 atoms in the harmonic potential.
+In the above equation the parameters are: $k_b$ is the bond force constant, $b-b_0$ is the atom distance from equilibrium, $k_\theta$ is the angle force constant, $\theta-\theta_0$ is the angle from the equilibrium between 3 bonded atoms, $k_\phi$ is the dihedral force constant, $n$ is the multiplicity of the dihedral function, $\phi$ is the dihedral angle, $\delta$ is the phase shift, $k_\omega$ is the improper dihedrals force constant, $\omega-\omega_0$ is the out of plane improper dihedrals angle, $R_{{min}_{ij}}$ is the constant for the Lennard-Jones potential, $r_{ij}$ is the distance between a pair of atoms and $q_{i}$ is the charge of an atom. The Urey-Bradley component serves the cross-term accounting for angle bending using 1,3 nonbonded interactions, where $k_{u}$ is the Urey-Bradley force constant, and $u-u_{0}$ is the distance between the 1,3 atoms in the harmonic potential.
 
-One challenge of this straightforward approach of the Newton's classical equations of motion for the proteins is the relatively short timestep. The commonly used maximum timestep allowing for energy conservation and stability of the protein is between 2fs and 5f. Considering most proteins fold on timescales longer than milliseconds, this requires to simulate $10^{12}$ steps. With modern GPUs, for smaller proteins, almost 1 microsecond of molecular dynamics trajectory can be simulated per day. Special purpose hardware \cite{shaw2014anton} can simulate up to 100 microseconds of MD trajectory per simulation day, but the access to this special purpose hardware is limited. To simulate the behavior of most biomolecules for relevant processes such as protein folding and other global structural rearrangements requires timescales of around $10^{-2} - 10^{1}$s. These slow processes are associated with the rare crossing of high free energy barriers, representing a bottleneck for the MD simulations.
+One challenge of the straightforward approach of utilizing Newton's classical equations of motion for simulation of protein behavior is the relatively short timestep of numerically simulating the molecular dynamics. The commonly used maximum timestep allowing for energy conservation and stability of the protein is between 2fs and 5f. Considering most proteins fold on timescales longer than milliseconds, this requires to simulate $10^{12}$ steps. With modern GPUs, for smaller proteins, almost 1 microsecond of molecular dynamics trajectory can be simulated per day. Special purpose hardware \cite{shaw2014anton} can simulate up to 100 microseconds of MD trajectory per simulation day, but the access to this special purpose hardware is limited and commonly GPUs are used. To simulate the behavior of most biomolecules for relevant processes such as protein folding and other global structural rearrangements requires timescales of around $10^{-2}s - 10^{1}s$. These slow processes are associated with the rare crossing of high free energy barriers, representing a bottleneck for the MD simulations.
 
 \section{TICA dimension reduction}
 
