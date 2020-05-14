@@ -21,6 +21,7 @@
 \usepackage{tikz}
 \usepackage{listings}
 \usepackage{afterpage}
+\usepackage{pdfpages}
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{4}
 \DeclareUnicodeCharacter{0301}{ }
@@ -77,38 +78,16 @@
  framexleftmargin=-1.5em,
 }
 
-\title{Adaptive sampling of Conformational Dynamics}
-\ctitle{Adaptive sampling of Conformational Dynamics}
-\author{Eugen Hruška}
-%\department{Electrical and Computer Engineering}
-\school{Rice University}
-\degree{Doctor of Philosophy}
-
-\committee {
-        Cecilia Clementi, Thesis Director\\
-Professor of Chemistry and Chemical \&
-Biomolecular Engineering\and
-Jose Onuchic, Chair \\
-        Harry C. and Olga K. Wiess Chair of
-Physics, Professor of Chemistry and
-BioSciences \and
-        Jason Hafner \\
-        Professor of Physics \& Astronomy and
-Chemistry \and
-        Matteo Pasquali\\
-        A. J. Hartsook Professor of Chemical and
-Biomolecular Engineering, Chemistry,
-Material Science and NanoEngineering 
-}
-
-\address{Houston, Texas}
-\donemonth{April} \doneyear{2020} \makeindex
 \begin{document}
+%
 
+%
   \begin{frontmatter}
    \pagenumbering{roman}
    %\makecover
-   \maketitle
+   \begin{titlepage}
+   \includepdf[pages=-]{final/Hruska-thesis-title-page.pdf}
+   \end{titlepage}%\maketitle
    
    %\include{ded}
    \include{abstract}
